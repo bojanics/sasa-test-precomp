@@ -13,6 +13,6 @@
     }
   ],
   "disabled": false,
-  "scriptFile": "bin\\testprecomp1.dll",
+  "scriptFile": "testprecomp1.dll",
   "entryPoint": "testprecomp1.precomp.Run"
 }
