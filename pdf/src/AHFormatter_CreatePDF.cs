@@ -130,14 +130,14 @@ namespace AHFormatter_CreatePDF
                 string paramsloginfo = "{\n" +
                     "   xsl: " + xsl + ",\n" +
                     "   xslPre: " + xslpre + ",\n"+
-                    "   pdfTemplates: " + pdftemplate + ",\n"+
+                    "   pdfTemplate: " + pdftemplate + ",\n"+
                     "   signPdf: " + signPdf + ",\n"+
                     "   lockPdfWithPassword: " + lockPdfWithPassword + ",\n" +
                     "   lockPdfPassword: " + (lockPdfPassword != null ? "xxxxxx" : lockPdfPassword) + ",\n" +
                     "   lockPdfPassword_AppSettingName: " + lockPdfPassword_AppSettingName + ",\n" +
                 "}";
                 log.Info("PDF will be created according to the following parameters:" + paramsloginfo);
-
+          
                 pdfinfo = new JObject{
                     {"isSigned", signPdf},
                     {"isLockedWithPassword", lockPdfWithPassword},
