@@ -4,7 +4,10 @@
       "authLevel": "function",
       "name": "req",
       "type": "httpTrigger",
-      "direction": "in"
+      "direction": "in",
+      "methods": [
+        "post"
+      ]
     },
     {
       "name": "$return",
@@ -13,7 +16,6 @@
     }
   ],
   "disabled": false,
-  "scriptFile": "bin\\AzureFunctionAHFormatterNewFromScratch.dll",
-  "entryPoint": "AzureFunctionAHFormatterNewFromScratch.AHFormatter.Run"
-  
+  "scriptFile": "bin\\AHFormatter_CreatePDF.dll",
+  "entryPoint": "AHFormatter_CreatePDF.AHFormatter_CreatePDF.Run"
 }
