@@ -17,9 +17,9 @@ using System.Security.Cryptography.X509Certificates;
 
 namespace AHFormatter_CreatePDF
 {
-    public static class AHFormatter_CreatePDF
+    public static class AHFormatter
     {
-        [FunctionName("AHFormatter_CreatePDF")]
+        [FunctionName("AHFormatter")]
         public static HttpResponseMessage Run([HttpTrigger(AuthorizationLevel.Function, "post")]HttpRequestMessage req, TraceWriter log, ExecutionContext context)
         {
             log.Info("Starting creation of PDF...");
@@ -30,21 +30,36 @@ namespace AHFormatter_CreatePDF
             string ahlpath1 = homeloc + "/ahflibs";
             string ahlpath2 = rootloc + "/ahflibs";
             // The ahlpath1 is for Azure portal when we deploy pre-compiled function
-            if (!path.Contains(ahlpath1) && Directory.Exists(ahlpath1))
+            if (!path.Contains(ahlpath1))
             {
-                path += ";" + ahlpath1;
-                Environment.SetEnvironmentVariable("Path", path, EnvironmentVariableTarget.Process);
-                log.Info("location " + ahlpath1 + " added to PATH");
+                {
+                    if (Directory.Exists(ahlpath1))
+                    {
+                        path += ";" + ahlpath1;
+                        Environment.SetEnvironmentVariable("Path", path, EnvironmentVariableTarget.Process);
+                        log.Info("location " + ahlpath1 + " added to PATH");
+                    }
+                    else
+                    {
+                        log.Warning("location " + ahlpath1 + " does not exist!");
+                    }
+                }
             }
             path = Environment.GetEnvironmentVariable("Path", EnvironmentVariableTarget.Process);
             // The ahlpath2 is for the local VS development
-            if (!path.Contains(ahlpath2) && Directory.Exists(ahlpath2))
-            {
-                path += ";" + ahlpath2;
-                Environment.SetEnvironmentVariable("Path", path, EnvironmentVariableTarget.Process);
-                log.Info("location " + ahlpath2 + " added to PATH");
+            if (!path.Contains(ahlpath2)) {
+                if (Directory.Exists(ahlpath2))
+                {
+                    path += ";" + ahlpath2;
+                    Environment.SetEnvironmentVariable("Path", path, EnvironmentVariableTarget.Process);
+                    log.Info("location " + ahlpath2 + " added to PATH");
+                }
+                else
+                {
+                    //log.Warning("location " + ahlpath2 + " does not exist!");
+                }
             }
-            log.Info("PATH=" + Environment.GetEnvironmentVariable("Path", EnvironmentVariableTarget.Process));
+            //log.Info("PATH=" + Environment.GetEnvironmentVariable("Path", EnvironmentVariableTarget.Process));
 
             const string DEFAULT_lockPdfPassword_APPSETTING_NAME = "PDFGEN_DEFAULT_lockPdfPassword";
             const string SIGN_PDF_REASON_APPSETTING_NAME = "PDFGEN_SIGN_PDF_REASON";
@@ -112,6 +127,16 @@ namespace AHFormatter_CreatePDF
                 catch (Exception ex)
                 {
                 }
+                string paramsloginfo = "{\n" +
+                    "   xsl: " + xsl + ",\n" +
+                    "   xslPre: " + xslpre + ",\n"+
+                    "   pdfTemplates: " + pdftemplate + ",\n"+
+                    "   signPdf: " + signPdf + ",\n"+
+                    "   lockPdfWithPassword: " + lockPdfWithPassword + ",\n" +
+                    "   lockPdfPassword: " + (lockPdfPassword != null ? "xxxxxx" : lockPdfPassword) + ",\n" +
+                    "   lockPdfPassword_AppSettingName: " + lockPdfPassword_AppSettingName + ",\n" +
+                "}";
+                log.Info("PDF will be created according to the following parameters:" + paramsloginfo);
 
                 pdfinfo = new JObject{
                     {"isSigned", signPdf},
