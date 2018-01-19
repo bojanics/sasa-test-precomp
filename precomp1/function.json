@@ -1,15 +1,15 @@
 {
-  "generatedBy": "Microsoft.NET.Sdk.Functions-1.0.0.0",
-  "configurationSource": "attributes",
   "bindings": [
     {
-      "type": "httpTrigger",
-      "methods": [
-        "get",
-        "post"
-      ],
       "authLevel": "function",
-      "name": "req"
+      "name": "req",
+      "type": "httpTrigger",
+      "direction": "in"
+    },
+    {
+      "name": "$return",
+      "type": "http",
+      "direction": "out"
     }
   ],
   "disabled": false,
