@@ -134,7 +134,7 @@ namespace AHFormatter_CreatePDF
                     "   signPdf: " + signPdf + ",\n"+
                     "   lockPdfWithPassword: " + lockPdfWithPassword + ",\n" +
                     "   lockPdfPassword: " + (lockPdfPassword != null ? "xxxxxx" : lockPdfPassword) + ",\n" +
-                    "   lockPdfPassword_AppSettingName: " + lockPdfPassword_AppSettingName + ",\n" +
+                    "   lockPdfPassword_AppSettingName: " + lockPdfPassword_AppSettingName + "\n" +
                 "}";
                 log.Info("PDF will be created according to the following parameters:" + paramsloginfo);
           
