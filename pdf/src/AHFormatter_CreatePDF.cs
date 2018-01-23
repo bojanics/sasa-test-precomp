@@ -5,6 +5,7 @@ using Microsoft.Azure.WebJobs.Extensions.Http;
 using Microsoft.Azure.WebJobs.Host;
 using XfoDotNetCtl;
 using System;
+using System.Configuration;
 using Saxon.Api;
 using System.IO;
 using System.Collections.Generic;
@@ -61,7 +62,7 @@ namespace AHFormatter_CreatePDF
             }
             //log.Info("PATH=" + Environment.GetEnvironmentVariable("Path", EnvironmentVariableTarget.Process));
 
-            const string DEFAULT_lockPdfPassword_APPSETTING_NAME = "PDFGEN_DEFAULT_lockPdfPassword";
+            const string DEFAULT_lockPdfPassword_CONNECTIONSTRING_NAME = "PDFGEN_DEFAULT_lockPdfPassword";
             const string SIGN_PDF_REASON_APPSETTING_NAME = "PDFGEN_SIGN_PDF_REASON";
             const string SIGN_PDF_LOCATION_APPSETTING_NAME = "PDFGEN_SIGN_PDF_LOCATION";
             const string SIGN_PDF_CONTACT_APPSETTING_NAME = "PDFGEN_SIGN_PDF_CONTACT";
@@ -186,12 +187,16 @@ namespace AHFormatter_CreatePDF
                             }
                             else
                             {
-                                lockpwd = System.Environment.GetEnvironmentVariable(DEFAULT_lockPdfPassword_APPSETTING_NAME);
+                                var lpcs = ConfigurationManager.ConnectionStrings[DEFAULT_lockPdfPassword_CONNECTIONSTRING_NAME];
+                                if (lpcs!=null)
+                                {
+                                    lockpwd = lpcs.ConnectionString;
+                                }
                             }
                         }
                         if (lockpwd == null)
                         {
-                            throw new Exception("PDF will not be generated because user didn't provide its own password and " + (lockPdfPassword_AppSettingName != null ? "" : "default ") + "Application Setting with the name " + (lockPdfPassword_AppSettingName != null ? lockPdfPassword_AppSettingName : DEFAULT_lockPdfPassword_APPSETTING_NAME) + " is not found!");
+                            throw new Exception("PDF will not be generated because user didn't provide its own password and " + (lockPdfPassword_AppSettingName != null ? "Application Setting" : "default Connection String") + " with the name " + (lockPdfPassword_AppSettingName != null ? lockPdfPassword_AppSettingName : DEFAULT_lockPdfPassword_CONNECTIONSTRING_NAME) + " is not found!");
                         }
                     }
                     string signReason = null;
