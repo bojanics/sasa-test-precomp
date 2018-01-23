@@ -120,10 +120,10 @@ namespace AHFormatter_CreatePDF
                     lockPdfPassword = json.lockPdfPassword;
                 }
                 catch (Exception ex) { }
-                string lockPdfPassword_AppSettingName = null;
+                string lockPdfPassword_ConnectionStringName = null;
                 try
                 {
-                    lockPdfPassword_AppSettingName = json.lockPdfPassword_AppSettingName;
+                    lockPdfPassword_ConnectionStringName = json.lockPdfPassword_ConnectionStringName;
                 }
                 catch (Exception ex)
                 {
@@ -135,7 +135,7 @@ namespace AHFormatter_CreatePDF
                     "   signPdf: " + signPdf + ",\n"+
                     "   lockPdfWithPassword: " + lockPdfWithPassword + ",\n" +
                     "   lockPdfPassword: " + (lockPdfPassword != null ? "xxxxxx" : lockPdfPassword) + ",\n" +
-                    "   lockPdfPassword_AppSettingName: " + lockPdfPassword_AppSettingName + "\n" +
+                    "   lockPdfPassword_ConnectionStringName: " + lockPdfPassword_ConnectionStringName + "\n" +
                 "}";
                 log.Info("PDF will be created according to the following parameters:" + paramsloginfo);
           
@@ -181,22 +181,27 @@ namespace AHFormatter_CreatePDF
                         }
                         else
                         {
-                            if (lockPdfPassword_AppSettingName != null)
+                            if (lockPdfPassword_ConnectionStringName != null)
                             {
-                                lockpwd = System.Environment.GetEnvironmentVariable(lockPdfPassword_AppSettingName);
-                            }
-                            else
-                            {
-                                var lpcs = ConfigurationManager.ConnectionStrings[DEFAULT_lockPdfPassword_CONNECTIONSTRING_NAME];
-                                if (lpcs!=null)
+                                var lpcs = ConfigurationManager.ConnectionStrings[lockPdfPassword_ConnectionStringName];
+                                if (lpcs != null)
                                 {
                                     lockpwd = lpcs.ConnectionString;
                                 }
                             }
+                            else
+                            {
+                                var lpcs = ConfigurationManager.ConnectionStrings[DEFAULT_lockPdfPassword_CONNECTIONSTRING_NAME];
+                                if (lpcs != null)
+                                {
+                                    lockpwd = lpcs.ConnectionString;
+                                }
+                            }
+                            
                         }
                         if (lockpwd == null)
                         {
-                            throw new Exception("PDF will not be generated because user didn't provide its own password and " + (lockPdfPassword_AppSettingName != null ? "Application Setting" : "default Connection String") + " with the name " + (lockPdfPassword_AppSettingName != null ? lockPdfPassword_AppSettingName : DEFAULT_lockPdfPassword_CONNECTIONSTRING_NAME) + " is not found!");
+                            throw new Exception("PDF will not be generated because user didn't provide its own password and " + (lockPdfPassword_ConnectionStringName != null ? "" : "default ") + "Connection String with the name " + (lockPdfPassword_ConnectionStringName != null ? lockPdfPassword_ConnectionStringName : DEFAULT_lockPdfPassword_CONNECTIONSTRING_NAME) + " is not found!");
                         }
                     }
                     string signReason = null;
