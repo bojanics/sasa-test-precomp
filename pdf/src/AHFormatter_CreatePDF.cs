@@ -520,6 +520,8 @@ namespace AHFormatter_CreatePDF
                     ret.value = rootloc + "/"+ ret.value;
                 }
                 ret.source = "DEFAULT Value";
+            } else if (param!=null && settingOrConnectionStringName.StartsWith("certificateFile_") && rootloc!=null) {
+                ret.value = rootloc + "/" + ret.value;
             }
             //log.Info("["+ (ret.orig_value != null ? ret.orig_value : "null")+","+(ret.value!=null ? ret.value : "null") +","+ret.param_provided+"] returned from source '"+ret.source+"' for call determineParameter(" + param + "," + param_SettingOrConnectionStringName + "," + settingOrConnectionStringName + "," + config_DEFAULT_SettingOrConnectionStringName + "," + isSetting + "," + rootloc + "," + defaultVal + ")");
             return ret;
