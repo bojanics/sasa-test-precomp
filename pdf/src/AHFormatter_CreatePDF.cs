@@ -426,11 +426,17 @@ namespace AHFormatter_CreatePDF
             {
                 if (param.param_provided == match_with_param_provided)
                 {
-                    addparam = true;
+                    if (param.value != null || param.param_provided)
+                    {
+                        addparam = true;
+                    }
                 }
             } else
             {
-                addparam = true;
+                if (param.value != null || param.param_provided)
+                {
+                    addparam = true;
+                }
             }
             if (addparam)
             {
