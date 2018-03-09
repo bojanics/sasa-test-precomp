@@ -24,43 +24,32 @@ namespace AHFormatter_CreatePDF
         public static HttpResponseMessage Run([HttpTrigger(AuthorizationLevel.Function, "post")]HttpRequestMessage req, TraceWriter log, ExecutionContext context)
         {
             log.Info("Starting creation of PDF...");
-            string homeloc = context.FunctionDirectory;
-            string rootloc = Directory.GetParent(homeloc).FullName;
+            string rootloc = context.FunctionDirectory;
+            bool isLocal = string.IsNullOrEmpty(Environment.GetEnvironmentVariable("WEBSITE_INSTANCE_ID"));
+            if (isLocal)
+            {
+                rootloc = Directory.GetParent(rootloc).FullName;
+            }
 
+            
             string path = Environment.GetEnvironmentVariable("Path", EnvironmentVariableTarget.Process);
-            string ahlpath1 = homeloc + "/ahflibs";
-            string ahlpath2 = rootloc + "/ahflibs";
+            string ahlpath = rootloc + "/ahflibs";
             // The ahlpath1 is for Azure portal when we deploy pre-compiled function
-            if (!path.Contains(ahlpath1))
+            if (!path.Contains(ahlpath))
             {
                 {
-                    if (Directory.Exists(ahlpath1))
+                    if (Directory.Exists(ahlpath))
                     {
-                        path += ";" + ahlpath1;
+                        path += ";" + ahlpath;
                         Environment.SetEnvironmentVariable("Path", path, EnvironmentVariableTarget.Process);
-                        log.Info("location " + ahlpath1 + " added to PATH");
+                        log.Info("location " + ahlpath + " added to PATH");
                     }
                     else
                     {
-                        log.Warning("location " + ahlpath1 + " does not exist!");
+                        log.Warning("location " + ahlpath + " does not exist!");
                     }
                 }
             }
-            path = Environment.GetEnvironmentVariable("Path", EnvironmentVariableTarget.Process);
-            // The ahlpath2 is for the local VS development
-            if (!path.Contains(ahlpath2)) {
-                if (Directory.Exists(ahlpath2))
-                {
-                    path += ";" + ahlpath2;
-                    Environment.SetEnvironmentVariable("Path", path, EnvironmentVariableTarget.Process);
-                    log.Info("location " + ahlpath2 + " added to PATH");
-                }
-                else
-                {
-                    //log.Warning("location " + ahlpath2 + " does not exist!");
-                }
-            }
-            //log.Info("PATH=" + Environment.GetEnvironmentVariable("Path", EnvironmentVariableTarget.Process));
 
             // Some constants for default settings and code defaults
             const string DEFAULT_xsl_APPSETTING_NAME = "PDFGEN_DEFAULT_xsl";
