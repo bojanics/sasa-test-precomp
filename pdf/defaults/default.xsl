@@ -71,8 +71,8 @@
 </xsl:for-each>
 <xsl:for-each select="./*">
    <xsl:if test="not(@NS1:name)">
-      <xsl:value-of select="concat(name(),': ')" />
-      <xsl:value-of select="text()"/>
+      <xsl:value-of select="concat(@name,': ')" />
+      <xsl:value-of select="@value"/>
       <xsl:text>&#xa;</xsl:text>
    </xsl:if>
 </xsl:for-each>

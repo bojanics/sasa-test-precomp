@@ -3,7 +3,7 @@
    <xsl:template match="data">
       <NS1:form xmlns:NS1="http://www.greco.eu/schemas/2014/GOSPOS">
          <xsl:for-each select="*">
-            <NS1:item NS1:name="{name()}" NS1:value="{text()}"/>
+            <NS1:item NS1:name="{@name}" NS1:value="{@value}"/>
          </xsl:for-each>
       </NS1:form>
    </xsl:template>

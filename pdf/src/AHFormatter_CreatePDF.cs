@@ -6,6 +6,7 @@ using Microsoft.Azure.WebJobs.Host;
 using XfoDotNetCtl;
 using System;
 using System.Configuration;
+using System.Xml;
 using Saxon.Api;
 using System.IO;
 using System.Collections.Generic;
@@ -286,7 +287,7 @@ namespace AHFormatter_CreatePDF
                 byte[] pdfByteArray = null;
 
                 // Dictionary values of JSON's data
-                IDictionary<string, string> data_dic = null;
+                IDictionary<string, string> data_dic = JsonConvert.DeserializeObject<IDictionary<string, string>>(data);
 
                 string firstErrorMsg = null;
                 // Determine value of all the parameters using request parameters, default settings and code default and also update pdfinfo response
@@ -343,14 +344,13 @@ namespace AHFormatter_CreatePDF
                     using (WebClient wclient = new WebClient())
                     {
                         pdfByteArray = wclient.DownloadData(PDFTemplate_transf.value);
-                    }
-                    data_dic = JsonConvert.DeserializeObject<IDictionary<string, string>>(data);
+                    }                    
                 }
                 // otherwise, do XSL transformation (with optional pre-transformation)
                 else
                 {
                     AddResponseParam(pdfInfo, "xsl", xsl_transf, true, false, false, false);
-                    string xml = JsonConvert.DeserializeXmlNode(data, "data").OuterXml;
+                    string xml = convertJSON2XML(data_dic);
                     // converting Plain XML into other XML format by using XSL pre transformation if exists
                     if (xslPre_transf.value != null)
                     {
@@ -409,6 +409,28 @@ namespace AHFormatter_CreatePDF
             return req.CreateResponse(statusCode, response_body);
         }
 
+        private static string convertJSON2XML (IDictionary<string,string> data)
+        {
+            XmlDocument doc = new XmlDocument();
+            //(1) the xml declaration is recommended, but not mandatory
+            XmlDeclaration xmlDeclaration = doc.CreateXmlDeclaration("1.0", "UTF-8", null);
+            XmlElement root = doc.DocumentElement;
+            doc.InsertBefore(xmlDeclaration, root);
+            //(2) string.Empty makes cleaner code
+            XmlElement dataElement = doc.CreateElement(string.Empty, "data", string.Empty);
+            doc.AppendChild(dataElement);
+
+            foreach (KeyValuePair<string, string> dic in data)
+            {
+                XmlElement propertyElement = doc.CreateElement(string.Empty, "property", string.Empty);
+                propertyElement.SetAttribute("name", dic.Key);
+                propertyElement.SetAttribute("value", dic.Value);
+                dataElement.AppendChild(propertyElement);
+                //pdfFormFields.SetField(dic.Key, dic.Value);
+            }
+            return doc.OuterXml;
+        }
+
         private static string handleFirstErrorMessage (string currentErrorMessage,ParamInfo info)
         {
             if (currentErrorMessage==null)
@@ -451,7 +473,7 @@ namespace AHFormatter_CreatePDF
             }
         }
 
-        static ParamInfo handleParameter(string param, string param_SettingOrConnectionStringName, string settingOrConnectionStringName, string config_DEFAULT_SettingOrConnectionStringName, Boolean isSetting, string rootloc, string defaultVal, TraceWriter log)
+        private static ParamInfo handleParameter(string param, string param_SettingOrConnectionStringName, string settingOrConnectionStringName, string config_DEFAULT_SettingOrConnectionStringName, Boolean isSetting, string rootloc, string defaultVal, TraceWriter log)
         {
             ParamInfo ret = new ParamInfo();
             if (param != null)
@@ -522,7 +544,7 @@ namespace AHFormatter_CreatePDF
             return ret;
         }
 
-        static byte[] doPDFGen(string xml, string xsl, TraceWriter log)
+        private static byte[] doPDFGen(string xml, string xsl, TraceWriter log)
         {
             MemoryStream outFs = new MemoryStream();
 
@@ -560,7 +582,7 @@ namespace AHFormatter_CreatePDF
             }
         }
 
-        static MemoryStream doXSLT20(string xml, string xsl)
+        private static MemoryStream doXSLT20(string xml, string xsl)
         {
             // Compile stylesheet
             var processor = new Processor();
@@ -584,7 +606,7 @@ namespace AHFormatter_CreatePDF
         }
 
 
-        public static void DigiSignPdf(byte[] source,
+        private static void DigiSignPdf(byte[] source,
             Stream destinationStream,
             IDictionary<string, string> data,
             Stream privateKeyStream,
