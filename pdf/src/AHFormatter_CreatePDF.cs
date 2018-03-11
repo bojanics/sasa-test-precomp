@@ -337,21 +337,23 @@ namespace AHFormatter_CreatePDF
                     throw new Exception(firstErrorMsg);
                 }
 
+                bool doPDFTempl = false;
                 // if PDFTemplate is specified, use it
-                if (PDFTemplate_transf.value != null && !xsl_transf.param_provided) 
+                if (PDFTemplate_transf.value != null && (PDFTemplate_transf.param_provided || !xsl_transf.param_provided))   
                 {
                     AddResponseParam(pdfInfo, "PDFTemplate", PDFTemplate_transf, true, false, false, false);
                     using (WebClient wclient = new WebClient())
                     {
                         pdfByteArray = wclient.DownloadData(PDFTemplate_transf.value);
-                    }                    
+                    }
+                    doPDFTempl = true;
                 }
                 // otherwise, do XSL transformation (with optional pre-transformation)
                 else
                 {
                     AddResponseParam(pdfInfo, "xsl", xsl_transf, true, false, false, false);
                     string xml = convertJSON2XML(data_dic);
-                    // converting Plain XML into other XML format by using XSL pre transformation if exists
+                    // converting default XML format into other XML format by using XSL pre transformation if exists
                     if (xslPre_transf.value != null)
                     {
                         AddResponseParam(pdfInfo, "xslPre", xslPre_transf, true, false, false, false);
@@ -385,7 +387,7 @@ namespace AHFormatter_CreatePDF
                     {
                         AddResponseParam(pdfInfo, "lockPDFPassword", lockPDFPassword_transf, true, false, true, false);
                     }
-                    DigiSignPdf(pdfByteArray, ss, data_dic, certificate_transf, certificatePassword_transf.value, signPDFHashAlgorithm_transf.value, signPDFReason_transf.value, signPDFLocation_transf.value, signPDFContact_transf.value, doSigning, doLocking ? lockPDFPassword_transf.value : null, false);
+                    DigiSignPdf(pdfByteArray, ss, doPDFTempl ? data_dic : null, certificate_transf, certificatePassword_transf.value, signPDFHashAlgorithm_transf.value, signPDFReason_transf.value, signPDFLocation_transf.value, signPDFContact_transf.value, doSigning, doLocking ? lockPDFPassword_transf.value : null, false);
                     pdfByteArray = ss.ToArray();
                 }
 
@@ -426,7 +428,6 @@ namespace AHFormatter_CreatePDF
                 propertyElement.SetAttribute("name", dic.Key);
                 propertyElement.SetAttribute("value", dic.Value);
                 dataElement.AppendChild(propertyElement);
-                //pdfFormFields.SetField(dic.Key, dic.Value);
             }
             return doc.OuterXml;
         }
@@ -537,8 +538,23 @@ namespace AHFormatter_CreatePDF
                     ret.value = rootloc + "/"+ ret.value;
                 }
                 ret.source = "DEFAULT Value";
-            } else if (param!=null && settingOrConnectionStringName.StartsWith("certificateFile_") && rootloc!=null) {
-                ret.value = rootloc + "/" + ret.value;
+            } else if (param!=null && (settingOrConnectionStringName.StartsWith("certificateFile_") || settingOrConnectionStringName.StartsWith("xsl")) && rootloc!=null) {
+                Uri uri = null;
+                try
+                {
+                    uri = new Uri(ret.value);
+                }
+                catch (UriFormatException ex)
+                {
+                    try
+                    {
+                        uri = new Uri(rootloc + "/" + ret.value);
+                        ret.value = rootloc + "/" + ret.value;
+                    } catch (Exception ex2)
+                    {
+                    }
+                }
+                
             }
             //log.Info("["+ (ret.orig_value != null ? ret.orig_value : "null")+","+(ret.value!=null ? ret.value : "null") +","+ret.param_provided+"] returned from source '"+ret.source+"' for call determineParameter(" + param + "," + param_SettingOrConnectionStringName + "," + settingOrConnectionStringName + "," + config_DEFAULT_SettingOrConnectionStringName + "," + isSetting + "," + rootloc + "," + defaultVal + ")");
             return ret;
