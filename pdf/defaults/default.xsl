@@ -62,6 +62,11 @@
 <xsl:variable name="backgroundColorVariable5">#ffffff</xsl:variable>
 <fo:block-container display-align="before" reference-orientation="0">
 <fo:block position="relative" text-align="start" color="#000000" font-family="Arial" font-size="11.0pt" line-height="14.5pt" white-space-collapse="false"  linefeed-treatment="preserve" white-space-treatment="ignore-if-surrounding-linefeed"  hyphenate="true" language="en"  padding-bottom="0.0pt" start-indent="0.0pt" end-indent="0.0pt" padding-top="28.45pt" width="518.0pt"  height="30.0pt" >
+   <xsl:text>HERE IS THE DATA:</xsl:text>
+</fo:block>
+</fo:block-container>
+<fo:block-container display-align="before" reference-orientation="0">
+<fo:block position="relative" text-align="start" color="#000000" font-family="Arial" font-size="11.0pt" line-height="14.5pt" white-space-collapse="false"  linefeed-treatment="preserve" white-space-treatment="ignore-if-surrounding-linefeed"  hyphenate="true" language="en"  padding-bottom="0.0pt" start-indent="0.0pt" end-indent="0.0pt" padding-top="28.45pt" width="518.0pt"  height="30.0pt" >
 <xsl:for-each select="NS1:item">
    <xsl:if test="@NS1:name">
       <xsl:value-of select="concat(@NS1:name,': ')" />
