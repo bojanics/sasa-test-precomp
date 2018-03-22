@@ -168,6 +168,7 @@ namespace AHFormatter_CreatePDF
                 ParamInfo lockPDFPassword_transf = handleParameter(json, config_json, "lockPDFPassword", false, null, DEFAULT_lockPDFPassword_CODE, log);
                 AddResponseParam(pdfInfo, lockPDFPassword_transf, true, false);
                 firstErrorMsg = handleFirstErrorMessage(firstErrorMsg, lockPDFPassword_transf);
+
                 /*
                 string paramsloginfo = "{\n" +
                     "   xsl: " + xsl_transf.param_value + ",\n" +
@@ -206,26 +207,25 @@ namespace AHFormatter_CreatePDF
                 }
 
                 // Now merge data payload of the defaults in configuration and the ones from the request (request overrides configuration)
-                JObject dataobj = new JObject();
-                // First take default data from configuration (if exists)
-                if (config_json != null)
-                {
-                    JProperty p = config_json.Property("data");
-                    if (p != null)
-                    {
-                        dataobj = p.Value.Value<JObject>();
-                    }
-                }
-
-                // Now take the data from the request (if exists) and merge it - request data override default data
+                
+                JObject dataobj_req = new JObject();
+                // Take the data from the request (if exists) 
                 if (json != null && json.data != null)
                 {
-                    JObject dataobj_req = json.data;
-                    // merge objects
-                    dataobj.Merge(dataobj_req);
+                    dataobj_req = json.data;
+                    pdfInfo.Add("data", dataobj_req);
                 }
+                JObject dataobj = new JObject();
+                // Take default data from configuration (if exists)
+                if (config_json != null && config_json.data != null)
+                {
+                    dataobj = config_json.data;
+                    pdfInfo.Add("Configuration_data", dataobj);
+                }                
 
-                //data = JsonConvert.SerializeObject(dataobj);
+                // merge objects - request data override default data
+                dataobj.Merge(dataobj_req);
+
 
                 // Dictionary values of JSON's data
                 IDictionary<string, string> data_dic = null;
@@ -244,7 +244,7 @@ namespace AHFormatter_CreatePDF
                 else
                 {
                     string xml = convertJSON2XML(dataobj);
-                    //log.Info(xml);
+                    //log.Info("XMLBEF="+xml);
                     // converting default XML format into other XML format by using XSL pre transformation if exists
                     if (xslPre_transf.value != null)
                     {
@@ -252,6 +252,7 @@ namespace AHFormatter_CreatePDF
                         byte[] ba = os.ToArray();
                         xml = Encoding.UTF8.GetString(ba, 0, ba.Length);
                     }
+                    //log.Info("XMLAFT=" + xml);
                     pdfByteArray = doPDFGen(xml, xsl_transf.value, log);
                 }
 

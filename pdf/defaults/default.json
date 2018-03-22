@@ -1,8 +1,9 @@
 {  
    "data":{  
-      "i1":"defv1",
-      "i2":"defv2",
-      "i3":"defv4"
+      "info1":"defv1",
+      "info2":"defv2",
+      "info4":"defv4",
+      "info5":"defv5"
    },
    "xsl":"./defaults/default.xsl",
    "xsl_SettingName":"SOME_xsl_REMOTE",
