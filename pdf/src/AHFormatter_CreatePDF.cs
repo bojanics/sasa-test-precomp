@@ -240,7 +240,8 @@ namespace AHFormatter_CreatePDF
                 statusCode = HttpStatusCode.InternalServerError;
                 statusMessage = "Failed to create PDF! Error message: " + e.Message + ", stackTrace=" + e.StackTrace+".";                
             }
-            log.Info(statusMessage+" PDFInfo="+pdfInfo.ToString());
+            log.Info(statusMessage);
+            //log.Info("PDFInfo="+pdfInfo.ToString());
             response_body.Add("PDF", pdfBase64);
             response_body.Add("PDFInfo", pdfInfo);
             response_body.Add("statusCode", (int)statusCode);
