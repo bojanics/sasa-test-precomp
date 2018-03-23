@@ -79,7 +79,13 @@ namespace AHFormatter_CreatePDF
                 body = req.Content.ReadAsStringAsync().Result;
                 if (body != null)
                 {
-                    json = JsonConvert.DeserializeObject(body);
+                    try
+                    {
+                        json = JsonConvert.DeserializeObject(body);
+                    } catch (Exception ex) 
+                    {
+                        throw new Exception("Invalid JSON body! "+ex.Message, ex);
+                    }
                 }
                 string Configuration = null;
                 try
@@ -103,7 +109,6 @@ namespace AHFormatter_CreatePDF
                 // Determine value of all the parameters using request parameters, default settings and code default and also update pdfinfo response
                 ParamInfo Configuration_transf = handleParameter(json, null, "Configuration", true, rootloc, null, log);
                 AddResponseParam(pdfInfo, Configuration_transf, false, false);
-                firstErrorMsg = handleFirstErrorMessage(firstErrorMsg, Configuration_transf);
                 dynamic config_json = null;
                 if (Configuration_transf.value != null)
                 {
@@ -130,76 +135,28 @@ namespace AHFormatter_CreatePDF
                 AddResponseParam(pdfInfo, xslPre_transf, false, false);
                 ParamInfo PDFTemplate_transf = handleParameter(json, config_json, "PDFTemplate", true, rootloc, null, log);
                 AddResponseParam(pdfInfo, PDFTemplate_transf, false, false);
-                firstErrorMsg = handleFirstErrorMessage(firstErrorMsg, PDFTemplate_transf);
-                // handle possible error for unexisting xsl/xslPre settings only if it will be used (the case when PDF is NOT generated from the template)
-                if (PDFTemplate_transf.source==0 || PDFTemplate_transf.source>4)
-                {
-                    firstErrorMsg = handleFirstErrorMessage(firstErrorMsg, xsl_transf);
-                    firstErrorMsg = handleFirstErrorMessage(firstErrorMsg, xslPre_transf);
-                }
                 ParamInfo signPDF_transf = handleParameter(json, config_json, "signPDF", true, null, DEFAULT_signPDF_CODE, log);
                 AddResponseParam(pdfInfo, signPDF_transf, false, true);
-                firstErrorMsg = handleFirstErrorMessage(firstErrorMsg, signPDF_transf);
                 bool doSigning = Boolean.Parse(signPDF_transf.value);
 
                 ParamInfo signPDFReason_transf = signPDFReason_transf = handleParameter(json, config_json, "signPDFReason", true, null, null, log);
                 AddResponseParam(pdfInfo, signPDFReason_transf, false, false);
-                firstErrorMsg = handleFirstErrorMessage(firstErrorMsg, signPDFReason_transf);
                 ParamInfo signPDFLocation_transf = handleParameter(json, config_json, "signPDFLocation", true, null, null, log);
                 AddResponseParam(pdfInfo, signPDFLocation_transf, false, false);
-                firstErrorMsg = handleFirstErrorMessage(firstErrorMsg, signPDFLocation_transf);
                 ParamInfo signPDFContact_transf = handleParameter(json, config_json, "signPDFContact", true, null, null, log);
                 AddResponseParam(pdfInfo, signPDFContact_transf, false, false);
-                firstErrorMsg = handleFirstErrorMessage(firstErrorMsg, signPDFContact_transf);
                 ParamInfo signPDFHashAlgorithm_transf = handleParameter(json, config_json, "signPDFHashAlgorithm", true, null, DEFAULT_signPDFHashAlgorithm_CODE, log);
                 AddResponseParam(pdfInfo, signPDFHashAlgorithm_transf, false, false);
-                firstErrorMsg = handleFirstErrorMessage(firstErrorMsg, signPDFHashAlgorithm_transf);
                 ParamInfo certificateFile_transf = handleParameter(json, config_json, "certificateFile", true, rootloc, DEFAULT_certificateFile_CODE, log);
                 AddResponseParam(pdfInfo, certificateFile_transf, false, false);
-                firstErrorMsg = handleFirstErrorMessage(firstErrorMsg, certificateFile_transf);
                 ParamInfo certificatePassword_transf = handleParameter(json, config_json, "certificatePassword", false, null, DEFAULT_certificatePassword_CODE, log);
                 AddResponseParam(pdfInfo, certificatePassword_transf, true, false);
-                firstErrorMsg = handleFirstErrorMessage(firstErrorMsg, certificatePassword_transf);
 
                 ParamInfo lockPDF_transf = handleParameter(json, config_json, "lockPDF", true, null, DEFAULT_lockPDF_CODE, log);
                 AddResponseParam(pdfInfo, lockPDF_transf, false, true);
-                firstErrorMsg = handleFirstErrorMessage(firstErrorMsg, lockPDF_transf);
                 bool doLocking = Boolean.Parse(lockPDF_transf.value);
                 ParamInfo lockPDFPassword_transf = handleParameter(json, config_json, "lockPDFPassword", false, null, DEFAULT_lockPDFPassword_CODE, log);
                 AddResponseParam(pdfInfo, lockPDFPassword_transf, true, false);
-                firstErrorMsg = handleFirstErrorMessage(firstErrorMsg, lockPDFPassword_transf);
-
-                /*
-                string paramsloginfo = "{\n" +
-                    "   xsl: " + xsl_transf.param_value + ",\n" +
-                    "   xsl_SettingName: " + xsl_transf.settingOrConfig_param_value + ",\n" +
-                    "   xslPre: " + xslPre_transf.param_value + ",\n" +
-                    "   xslPre_SettingName: " + xslPre_transf.settingOrConfig_param_value+ ",\n" +
-                    "   PDFTemplate: " + PDFTemplate_transf.param_value + ",\n" +
-                    "   PDFTemplate_SettingName: " + PDFTemplate_transf.settingOrConfig_param_value + ",\n" +
-                    "   signPDF: " + signPDF_transf.param_value + ",\n" +
-                    "   signPDF_SettingName: " + signPDF_transf.settingOrConfig_param_value + ",\n" +
-                    "   signPDFReason: " + signPDFReason_transf.param_value + ",\n" +
-                    "   signPDFReason_SettingName: " + signPDFReason_transf.settingOrConfig_param_value + ",\n" +
-                    "   signPDFLocation: " + signPDFLocation_transf.param_value + ",\n" +
-                    "   signPDFLocation_SettingName: " + signPDFLocation_transf.settingOrConfig_param_value + ",\n" +
-                    "   signPDFContact: " + signPDFReason_transf.param_value + ",\n" +
-                    "   signPDFContact_SettingName: " + signPDFContact_transf.settingOrConfig_param_value + ",\n" +
-                    "   signPDFHashAlgorithm: " + signPDFHashAlgorithm_transf.param_value + ",\n" +
-                    "   signPDFHashAlgorithm_SettingName: " + signPDFHashAlgorithm_transf.settingOrConfig_param_value + ",\n" +
-                    "   certificateFile: " + certificateFile_transf.param_value + ",\n" +
-                    "   certificateFile_SettingName: " + certificateFile_transf.settingOrConfig_param_value + ",\n" +
-                    "   certificatePassword: " + (certificatePassword_transf.param_value != null ? "xxxxxx" : certificatePassword_transf.param_value) + ",\n" +
-                    "   certificatePassword_ConnectionStringName: " + certificatePassword_transf.settingOrConfig_param_value + "\n" +
-                    "   lockPDF: " + lockPDF_transf.param_value + ",\n" +
-                    "   lockPDF_SettingName: " + lockPDF_transf.settingOrConfig_param_value + ",\n" +
-                    "   lockPDFPassword: " + (lockPDFPassword_transf.param_value != null ? "xxxxxx" : lockPDFPassword_transf.param_value) + ",\n" +
-                    "   lockPDFPassword_ConnectionStringName: " + lockPDFPassword_transf.settingOrConfig_param_value + "\n" +
-                    "   Configuration: " + Configuration_transf.param_value + ",\n" +
-                    "   Configuration_SettingName: " + Configuration_transf.settingOrConfig_param_value + ",\n" +
-                "}";
-                log.Info("PDF will be created according to the following parameters:" + paramsloginfo);
-                */
 
                 if (firstErrorMsg != null)
                 {
@@ -213,18 +170,18 @@ namespace AHFormatter_CreatePDF
                 if (json != null && json.data != null)
                 {
                     dataobj_req = json.data;
-                    pdfInfo.Add("data", dataobj_req);
                 }
                 JObject dataobj = new JObject();
                 // Take default data from configuration (if exists)
                 if (config_json != null && config_json.data != null)
                 {
                     dataobj = config_json.data;
-                    pdfInfo.Add("Configuration_data", dataobj);
                 }                
 
                 // merge objects - request data override default data
                 dataobj.Merge(dataobj_req);
+                // Add to pdfInfo
+                pdfInfo.Add("data", dataobj);
 
 
                 // Dictionary values of JSON's data
@@ -377,58 +334,17 @@ namespace AHFormatter_CreatePDF
             return doc.OuterXml;
         }
 
-        private static string handleFirstErrorMessage(string currentErrorMessage, ParamInfo info)
-        {
-            if (currentErrorMessage == null)
-            {
-                return info.errorMsg;
-            }
-            return currentErrorMessage;
-        }
-
         private static void AddResponseParam(JObject pdfinfo, ParamInfo param, bool isPassword, bool isBoolean)
         {
             // Add "normal" parameter from the request
-            if (param.param_provided)
-            {
-                _AddResponseParam(pdfinfo, param.name, param.param_value, isPassword, isBoolean);
-            }
-            // Add "setting" parameter from the request
-            if (param.settingOrConfigParam_provided)
-            {
-                _AddResponseParam(pdfinfo, param.name + (param.isSetting ? "_SettingName" : "_ConnectionStringName"), param.settingOrConfig_param_value, false, false);
-                _AddResponseParam(pdfinfo, param.name + (param.isSetting ? "_SettingValue" : "_ConnectionStringValue"), param.settingOrConfig_value, isPassword, false);
-            }
-            // Add "configuration normal" parameter
-            if (param.config_param_provided)
-            {
-                _AddResponseParam(pdfinfo, "Configuration_"+param.name, param.config_param_value, isPassword, isBoolean);
-            }
-            // Add "configuration setting" parameter
-            if (param.config_settingOrConfigParam_provided)
-            {
-                _AddResponseParam(pdfinfo, "Configuration_" + param.name + (param.isSetting ? "_SettingName" : "_ConnectionStringName"), param.config_settingOrConfig_param_value, false, false);
-                _AddResponseParam(pdfinfo, "Configuration_" + param.name + (param.isSetting ? "_SettingValue" : "_ConnectionStringValue"), param.config_settingOrConfig_value, isPassword, false);
-            }
-            // Add "default setting" value
-            _AddResponseParam(pdfinfo, "PDFGEN_DEFAULT_"+param.name, param.DEFAULT_settingOrConfig_value, isPassword, false);
-            // Add "default code" value
-            if (param.DEFAULT_code_value != null)
-            {
-                _AddResponseParam(pdfinfo, "PDFGEN_CODE_DEFAULT_" + param.name, param.DEFAULT_code_value, isPassword, isBoolean);
-            }
-
-        }
-        private static void _AddResponseParam(JObject pdfinfo, string name, string value, bool isPassword, bool isBoolean)
-        {
-            string val = (isPassword && value!=null ? "*****" : value);
+            string val = (isPassword && param.orig_value!=null ? "*****" : param.orig_value);
             if (isBoolean)
             {
-                pdfinfo.Add(name, Boolean.Parse(val));
+                pdfinfo.Add(param.name, Boolean.Parse(val));
             }
             else
             {
-                pdfinfo.Add(name, val);
+                pdfinfo.Add(param.name, val);
             }
         }
 
@@ -445,9 +361,7 @@ namespace AHFormatter_CreatePDF
                 JProperty p = json.Property(name);
                 if (p != null)
                 {
-                    ret.param_provided = true;
                     string v = p.Value.Value<string>();
-                    ret.param_value = v;
                     if (v != null)
                     {
                         ret.value = v;
@@ -457,132 +371,123 @@ namespace AHFormatter_CreatePDF
                     }
                 }
 
-                string psnorcsn = name + (isSetting ? "_SettingName" : "_ConnectionStringName");
-                p = json.Property(psnorcsn);
-                if (p != null)
+                if (!paramResolved)
                 {
-                    ret.settingOrConfigParam_provided = true;
-                    string v = p.Value.Value<string>();
-                    ret.settingOrConfig_param_value = v;
-                    if (v != null)
+                    string psnorcsn = name + (isSetting ? "_SettingName" : "_ConnectionStringName");
+                    p = json.Property(psnorcsn);
+                    if (p != null)
                     {
-                        if (isSetting)
+                        string v = p.Value.Value<string>();
+                        if (v != null)
                         {
-                            ret.settingOrConfig_value = System.Environment.GetEnvironmentVariable(v);
-                        }
-                        else
-                        {
-                            var cs = ConfigurationManager.ConnectionStrings[v];
-                            if (cs != null)
+                            string vv = null;
+                            if (isSetting)
                             {
-                                ret.settingOrConfig_value = cs.ConnectionString;
+                                vv = System.Environment.GetEnvironmentVariable(v);
                             }
-                        }
-                        if (!paramResolved)
-                        {
-                            ret.value = ret.settingOrConfig_value;
-                            ret.orig_value = ret.settingOrConfig_value;
-                            if (ret.value == null)
+                            else
                             {
-                                ret.errorMsg = "PDF will not be generated because " + (isSetting ? "Application setting" : "Connection string") + " '" + v + "' defined as the value of the parameter '" + psnorcsn + "' is not found or has undefined value!";
+                                var cs = ConfigurationManager.ConnectionStrings[v];
+                                if (cs != null)
+                                {
+                                    vv = cs.ConnectionString;
+                                }
                             }
-                            ret.source = 2;
-                            paramResolved = true;
+                            if (vv != null)
+                            {
+                                ret.value = vv;
+                                ret.orig_value = vv;
+                                ret.source = 2;
+                                paramResolved = true;
+                            }
                         }
                     }
                 }
             }
 
             // handle "normal" and "setting" param from the configuration
-            if (config_json != null)
+            if (!paramResolved && config_json != null)
             {
                 JProperty p = config_json.Property(name);
                 if (p != null)
                 {
-                    ret.config_param_provided = true;
                     string v = p.Value.Value<string>();
-                    ret.config_param_value = v;
                     if (v != null)
                     {
-                        if (!paramResolved)
-                        {
-                            ret.value = v;
-                            ret.orig_value = v;
-                            ret.source = 3;
-                            paramResolved = true;
-                        }
+                        ret.value = v;
+                        ret.orig_value = v;
+                        ret.source = 3;
+                        paramResolved = true;
                     }
                 }
 
-                string psnorcsn = name + (isSetting ? "_SettingName" : "_ConnectionStringName");
-                p = config_json.Property(psnorcsn);
-                if (p != null)
+                if (!paramResolved)
                 {
-                    ret.config_settingOrConfigParam_provided = true;
-                    string v = p.Value.Value<string>();
-                    ret.config_settingOrConfig_param_value = v;
-                    if (v != null)
+                    string psnorcsn = name + (isSetting ? "_SettingName" : "_ConnectionStringName");
+                    p = config_json.Property(psnorcsn);
+                    if (p != null)
                     {
-                        if (isSetting)
+                        string v = p.Value.Value<string>();
+                        if (v != null)
                         {
-                            ret.config_settingOrConfig_value = System.Environment.GetEnvironmentVariable(v);
-                        }
-                        else
-                        {
-                            var cs = ConfigurationManager.ConnectionStrings[v];
-                            if (cs != null)
+                            string vv = null;
+                            if (isSetting)
                             {
-                                ret.config_settingOrConfig_value = cs.ConnectionString;
+                                vv = System.Environment.GetEnvironmentVariable(v);
                             }
-                        }
-                        if (!paramResolved)
-                        {
-                            ret.value = ret.config_settingOrConfig_value;
-                            ret.orig_value = ret.config_settingOrConfig_value;
-                            if (ret.value == null)
+                            else
                             {
-                                ret.errorMsg = "PDF will not be generated because " + (isSetting ? "Application setting" : "Connection string") + " '" + v + "' defined in Configuration file as the value of the parameter '" + psnorcsn + "' is not found or has undefined value!";
+                                var cs = ConfigurationManager.ConnectionStrings[v];
+                                if (cs != null)
+                                {
+                                    vv = cs.ConnectionString;
+                                }
                             }
-                            ret.source = 4;
-                            paramResolved = true;
+                            if (vv != null)
+                            {
+                                ret.value = vv;
+                                ret.orig_value = vv;
+                                ret.source = 4;
+                                paramResolved = true;
+                            }
                         }
                     }
                 }
             }
 
             // handle DEFAULT setting
-            string config_DEFAULT_SettingOrConnectionStringName = "PDFGEN_DEFAULT_" + name;
-            if (isSetting)
-            {
-                ret.DEFAULT_settingOrConfig_value = System.Environment.GetEnvironmentVariable(config_DEFAULT_SettingOrConnectionStringName);
-            }
-            else
-            {
-                var cs = ConfigurationManager.ConnectionStrings[config_DEFAULT_SettingOrConnectionStringName];
-                if (cs != null)
-                {
-                    ret.DEFAULT_settingOrConfig_value = cs.ConnectionString;
-                }
-            }
             if (!paramResolved)
             {
-                ret.value = ret.DEFAULT_settingOrConfig_value;
-                ret.orig_value = ret.DEFAULT_settingOrConfig_value;
-                if (ret.value != null)
+                string config_DEFAULT_SettingOrConnectionStringName = "PDFGEN_DEFAULT_" + name;
+                string v = null;
+                if (isSetting)
                 {
+                    v = System.Environment.GetEnvironmentVariable(config_DEFAULT_SettingOrConnectionStringName);
+                }
+                else
+                {
+                    var cs = ConfigurationManager.ConnectionStrings[config_DEFAULT_SettingOrConnectionStringName];
+                    if (cs != null)
+                    {
+                        v = cs.ConnectionString;
+                    }
+                }
+                if (v != null)
+                {
+                    ret.value = v;
+                    ret.orig_value = v;
                     ret.source = 5;
                     paramResolved = true;
                 }
             }
 
             // handle default CODE value
-            ret.DEFAULT_code_value = defaultVal;
             if (!paramResolved)
             {
-                ret.value = defaultVal;
-                ret.orig_value = defaultVal;
-                if (ret.value != null)
+                if (defaultVal != null)
                 {
+                    ret.value = defaultVal;
+                    ret.orig_value = defaultVal;
                     ret.source = 6;
                 }
             }
@@ -657,7 +562,15 @@ namespace AHFormatter_CreatePDF
             // Compile stylesheet
             var processor = new Processor();
             var compiler = processor.NewXsltCompiler();
-            var executable = compiler.Compile(new Uri(xsl));
+            Uri uri = new Uri(xsl);
+            XsltExecutable executable = null;
+            try
+            {
+                executable = compiler.Compile(uri);
+            } catch (Exception ex)
+            {
+                throw new Exception("XSL '"+xsl+"' can't be used - maybe it is not accessible! "+ ex.Message, ex);
+            }
 
             // Load the source document
             byte[] byteArray = Encoding.UTF8.GetBytes(xml);
@@ -767,21 +680,8 @@ namespace AHFormatter_CreatePDF
         public string name { get; set; }
         public string value { get; set; }
         public string orig_value { get; set; }
-        public bool param_provided { get; set; }
-        public string param_value { get; set; }
-        public bool settingOrConfigParam_provided { get; set; }
-        public string settingOrConfig_param_value { get; set; }
-        public string settingOrConfig_value { get; set; }
-        public bool config_param_provided { get; set; }
-        public string config_param_value { get; set; }
-        public bool config_settingOrConfigParam_provided { get; set; }
-        public string config_settingOrConfig_param_value { get; set; }
-        public string config_settingOrConfig_value { get; set; }
-        public string DEFAULT_settingOrConfig_value { get; set; }
-        public string DEFAULT_code_value { get; set; }
         public bool isSetting { get; set; }
         public int source { get; set; }
-        public string errorMsg { get; set; }
     }
 
 }
