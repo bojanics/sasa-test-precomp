@@ -233,15 +233,14 @@ namespace AHFormatter_CreatePDF
                 pdfBase64 = Convert.ToBase64String(pdfByteArray);
                 statusCode = HttpStatusCode.OK;
                 statusMessage = "PDF successfully created.";
-                log.Info(statusMessage);
             }
             catch (Exception e)
             {
                 pdfBase64 = null;
                 statusCode = HttpStatusCode.InternalServerError;
-                statusMessage = "Failed to create PDF! Error message: " + e.Message + ", stackTrace=" + e.StackTrace;
-                log.Info(statusMessage);
+                statusMessage = "Failed to create PDF! Error message: " + e.Message + ", stackTrace=" + e.StackTrace+".";                
             }
+            log.Info(statusMessage+" PDFInfo="+pdfInfo.ToString());
             response_body.Add("PDF", pdfBase64);
             response_body.Add("PDFInfo", pdfInfo);
             response_body.Add("statusCode", (int)statusCode);
