@@ -1,0 +1,7 @@
+{
+    "calculation" : "./defaults/default.js",
+    "data" : {
+        "x":33,
+        "y":55
+    }
+}
