@@ -1,0 +1,21 @@
+{
+  "bindings": [
+    {
+      "authLevel": "anonymous",
+      "name": "req",
+      "type": "httpTrigger",
+      "direction": "in",
+      "methods": [
+        "post"
+      ]
+    },
+    {
+      "name": "$return",
+      "type": "http",
+      "direction": "out"
+    }
+  ],
+  "disabled": false,
+  "scriptFile": "bin\\AHFormatter_CreatePDF.dll",
+  "entryPoint": "AHFormatter_CreatePDF.AHFormatter.Run"
+}
