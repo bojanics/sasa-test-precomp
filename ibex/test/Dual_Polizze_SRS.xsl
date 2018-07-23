@@ -88,7 +88,7 @@
 <fo:static-content flow-name="regionAfter1">
 <fo:block-container display-align="before" reference-orientation="0">
 <fo:block position="relative" text-align="start" color="rgb-icc(0,0,0, #CMYK, 0.65,0.53,0.51,1.0)" font-family="Calibri" font-size="11.0pt" white-space-collapse="false"  linefeed-treatment="preserve" white-space-treatment="ignore-if-surrounding-linefeed"  hyphenate="true" language="en"  padding-bottom="0.0pt" start-indent="0.0pt" end-indent="0.0pt" padding-top="0.0pt" padding="0.0pt" width="100.0pt"  height="30.0pt" ><fo:block absolute-position="absolute" top="25cm" left="0cm">
-	    <fo:external-graphic src="url({concat($common_img,'dual_policy_footer.png')})" content-width="21.12cm" />
+	    <fo:external-graphic src="url({concat($common_img,'dual_policy_footer.jpg')})" content-width="21.12cm" />
 </fo:block>
 </fo:block>
 </fo:block-container>
@@ -111,7 +111,7 @@
 <fo:static-content flow-name="regionAfter2">
 <fo:block-container display-align="before" reference-orientation="0">
 <fo:block position="relative" text-align="start" color="rgb-icc(0,0,0, #CMYK, 0.65,0.53,0.51,1.0)" font-family="Calibri" font-size="11.0pt" white-space-collapse="false"  linefeed-treatment="preserve" white-space-treatment="ignore-if-surrounding-linefeed"  hyphenate="true" language="en"  padding-bottom="0.0pt" start-indent="0.0pt" end-indent="0.0pt" padding-top="0.0pt" padding="0.0pt" width="100.0pt"  height="30.0pt" ><fo:block absolute-position="absolute" top="25cm" left="0cm">
-	    <fo:external-graphic src="url({concat($common_img,'dual_policy_footer.png')})" content-width="21.12cm" />
+	    <fo:external-graphic src="url({concat($common_img,'dual_policy_footer.jpg')})" content-width="21.12cm" />
 </fo:block>
 </fo:block>
 </fo:block-container>
@@ -571,12 +571,12 @@
          </fo:table-cell>                         
          <fo:table-cell> 
             <fo:block>
-	    	<fo:external-graphic src="url({concat($common_img,'signature_1.png')})" content-width="5cm" />
+	    	<fo:external-graphic src="url({concat($common_img,'signature_1.jpg')})" content-width="5cm" />
 	    </fo:block>
          </fo:table-cell>
          <fo:table-cell> 
             <fo:block>
-	    	<fo:external-graphic src="url({concat($common_img,'signature_2.png')})" content-width="5cm" />
+	    	<fo:external-graphic src="url({concat($common_img,'signature_2.jpg')})" content-width="5cm" />
 	    </fo:block>
          </fo:table-cell>                         
       </fo:table-row>
