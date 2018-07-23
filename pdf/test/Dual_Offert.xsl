@@ -54,7 +54,7 @@
 <fo:region-start extent="0.0pt"  background-position-horizontal="center" background-position-vertical="center" />
 <fo:region-end extent="0.0pt"  background-position-horizontal="center" background-position-vertical="center" />
 </fo:simple-page-master>
-<fo:simple-page-master master-name="masterNamePageMain1" page-height="845.0pt" page-width="598.0pt" margin-top="0.0pt" margin-left="0.0pt" margin-bottom="0.0pt" margin-right="0.0pt" reference-orientation="0" fox:bleed="0pt" fox:crop-box="media-box" fox:crop-offset="0pt" fox:scale="1.0" background-image="url({concat($common_img,'Folgeseite_VMG.jpg')})">
+<fo:simple-page-master master-name="masterNamePageMain1" page-height="845.0pt" page-width="598.0pt" margin-top="0.0pt" margin-left="0.0pt" margin-bottom="0.0pt" margin-right="0.0pt" reference-orientation="0" fox:bleed="0pt" fox:crop-box="media-box" fox:crop-offset="0pt" fox:scale="1.0">
 <xsl:variable name="backgroundImageRepeat">no-repeat</xsl:variable><fo:region-body margin-left="42.68pt" margin-top="113.81pt" margin-bottom="71.13pt" margin-right="39.83pt"  background-position-horizontal="left" background-position-vertical="top" />
 <fo:region-before extent="113.81pt" precedence="true"  background-position-horizontal="left" background-position-vertical="top" />
 <fo:region-after extent="71.13pt" precedence="true"  background-position-horizontal="left" background-position-vertical="top" />
@@ -73,52 +73,7 @@
 <fo:page-sequence master-reference="masterNamePageTitle0" format="1">
 <xsl:attribute name="force-page-count">no-force</xsl:attribute>
 <fo:static-content flow-name="xsl-region-before">
-<fo:block-container position="absolute" top="-2.85pt" left="0.0pt" height="142.0pt" width="284.0pt" display-align="before" reference-orientation="0" fox:transform="rotate(0) , translate(0, 0)">
-<fo:block text-align="start" color="rgb-icc(0,0,0, #CMYK, 0.65,0.53,0.51,1.0)" font-family="Calibri" font-size="11.0pt" padding-bottom="0.0pt" start-indent="0.0pt" end-indent="0.0pt" padding-top="0.0pt" padding="0.0pt" position="relative" height="142.0pt" width="284.0pt" keep-together="auto"  white-space-collapse="false"  linefeed-treatment="preserve" white-space-treatment="ignore-if-surrounding-linefeed"  hyphenate="true" language="en" ><xsl:choose>
-<xsl:when test="NS1:item[@NS1:name='branding']/@NS1:value = 'GrECo'">
-   <fo:block absolute-position="absolute" top="0cm" left="0cm">
-	    <fo:external-graphic src="url({concat($common_img,'Titelseite_GrECo_HPF.jpg')})" content-width="21.12cm" />
-   </fo:block>
-</xsl:when>
-
-<xsl:when test="NS1:item[@NS1:name='branding']/@NS1:value = 'VMG'">
-   <fo:block absolute-position="absolute" top="0cm" left="0cm">
-	    <fo:external-graphic src="url({concat($common_img,'Titelseite_VMG_HPF.jpg')})" content-width="21.12cm" />
-   </fo:block>
-</xsl:when>
-
-<xsl:when test="NS1:item[@NS1:name='branding']/@NS1:value = 'BA-CA'">
-   <fo:block absolute-position="absolute" top="0cm" left="0cm">
-	    <fo:external-graphic src="url({concat($common_img,'Titelseite_BACA_HPF.jpg')})" content-width="21.12cm" />
-   </fo:block>
-</xsl:when>
-
-<xsl:when test="NS1:item[@NS1:name='branding']/@NS1:value = 'EGHV'">
-   <fo:block absolute-position="absolute" top="0cm" left="0cm">
-	    <fo:external-graphic src="url({concat($common_img,'Titelseite_EGHV_HPF.jpg')})" content-width="21.12cm" />
-   </fo:block>
-</xsl:when>
-
-<xsl:when test="NS1:item[@NS1:name='branding']/@NS1:value = 'GJRC'">
-   <fo:block absolute-position="absolute" top="0cm" left="0cm">
-	    <fo:external-graphic src="url({concat($common_img,'Titelseite_GrECo_HPF.jpg')})" content-width="21.12cm" />
-   </fo:block>
-</xsl:when>
-
-<xsl:when test="NS1:item[@NS1:name='branding']/@NS1:value = 'CMV'">
-   <fo:block absolute-position="absolute" top="0cm" left="0cm">
-	    <fo:external-graphic src="url({concat($common_img,'Titelseite_CMV_HPF.jpg')})" content-width="21.12cm" />
-   </fo:block>
-</xsl:when>
-
-<xsl:otherwise>
-	<fo:block absolute-position="absolute" top="0cm" left="0cm">
-	    <fo:external-graphic src="url({concat($common_img,'Titelseite_GrECo_HPF.jpg')})" content-width="21.12cm" />
-	</fo:block>
-</xsl:otherwise>
-
-</xsl:choose></fo:block>
-</fo:block-container>
+  <fo:block/>
 </fo:static-content>
 <fo:static-content flow-name="xsl-region-after">
   <fo:block/>
@@ -131,6 +86,69 @@
 </fo:static-content>
 <fo:flow flow-name="xsl-region-body">
 <fo:block/>
+<fo:block-container position="fixed"  z-index="-1"  display-align="before" reference-orientation="0">
+<fo:block position="relative" text-align="start" color="rgb-icc(0,0,0, #CMYK, 0.65,0.53,0.51,1.0)" font-family="Calibri" font-size="11.0pt" white-space-collapse="false"  linefeed-treatment="preserve" white-space-treatment="ignore-if-surrounding-linefeed"  hyphenate="true" language="en"  padding-bottom="0.0pt" start-indent="0.0pt" end-indent="0.0pt" padding-top="0.0pt" padding="0.0pt" width="284.0pt"  height="142.0pt" ><!--
+<xsl:if test="NS1:item[@NS1:name='branding']/@NS1:value = 'GrECo'">
+   <fo:block absolute-position="absolute" top="0cm" left="0cm">
+	    <fo:external-graphic src="url({concat($common_img,'Titelseite_GrECo_HPF.jpg')})" content-width="21.12cm" />
+   </fo:block>
+</xsl:if>
+
+<xsl:if test="NS1:item[@NS1:name='branding']/@NS1:value = 'VMG'">
+   <fo:block absolute-position="absolute" top="0cm" left="0cm">
+	    <fo:external-graphic src="url({concat($common_img,'Titelseite_VMG_HPF.jpg')})" content-width="21.12cm" />
+   </fo:block>
+</xsl:if>
+
+<xsl:if test="NS1:item[@NS1:name='branding']/@NS1:value = 'BA-CA'">
+   <fo:block absolute-position="absolute" top="0cm" left="0cm">
+	    <fo:external-graphic src="url({concat($common_img,'Titelseite_BACA_HPF.jpg')})" content-width="21.12cm" />
+   </fo:block>
+</xsl:if>
+
+<xsl:if test="NS1:item[@NS1:name='branding']/@NS1:value = 'EGHV'">
+   <fo:block absolute-position="absolute" top="0cm" left="0cm">
+	    <fo:external-graphic src="url({concat($common_img,'Titelseite_EGHV_HPF.jpg')})" content-width="21.12cm" />
+   </fo:block>
+</xsl:if>
+
+<xsl:if test="NS1:item[@NS1:name='branding']/@NS1:value = 'GJRC'">
+   <fo:block absolute-position="absolute" top="0cm" left="0cm">
+	    <fo:external-graphic src="url({concat($common_img,'Titelseite_GrECo_HPF.jpg')})" content-width="21.12cm" />
+   </fo:block>
+</xsl:if>
+
+<xsl:if test="NS1:item[@NS1:name='branding']/@NS1:value = 'CMV'">
+   <fo:block absolute-position="absolute" top="0cm" left="0cm">
+	    <fo:external-graphic src="url({concat($common_img,'Titelseite_CMV_HPF.jpg')})" content-width="21.12cm" />
+   </fo:block>
+</xsl:if>
+-->
+<!-- moz, 10.7.2018, Antenna House Support -->
+<xsl:if test="NS1:item[@NS1:name='branding']/@NS1:value = 'GrECo'">
+	    <fo:external-graphic src="url({concat($common_img,'Titelseite_GrECo_HPF.jpg')})"  />
+</xsl:if>
+
+<xsl:if test="NS1:item[@NS1:name='branding']/@NS1:value = 'VMG'">
+	    <fo:external-graphic src="url({concat($common_img,'Titelseite_VMG_HPF.jpg')})"  />
+</xsl:if>
+
+<xsl:if test="NS1:item[@NS1:name='branding']/@NS1:value = 'BA-CA'">
+	    <fo:external-graphic src="url({concat($common_img,'Titelseite_BACA_HPF.jpg')})"  />
+</xsl:if>
+
+<xsl:if test="NS1:item[@NS1:name='branding']/@NS1:value = 'EGHV'">
+	    <fo:external-graphic src="url({concat($common_img,'Titelseite_EGHV_HPF.jpg')})"  />
+</xsl:if>
+
+<xsl:if test="NS1:item[@NS1:name='branding']/@NS1:value = 'GJRC'">
+	    <fo:external-graphic src="url({concat($common_img,'Titelseite_GrECo_HPF.jpg')})"  />
+</xsl:if>
+
+<xsl:if test="NS1:item[@NS1:name='branding']/@NS1:value = 'CMV'">
+	    <fo:external-graphic src="url({concat($common_img,'Titelseite_CMV_HPF.jpg')})" />
+</xsl:if></fo:block>
+</fo:block-container>
 <fo:block-container display-align="before" reference-orientation="0">
 <fo:block position="relative" text-align="start" color="rgb-icc(0,0,0, #CMYK, 0.65,0.53,0.51,1.0)" font-family="Calibri" font-size="28.0pt" white-space-collapse="false"  linefeed-treatment="preserve" white-space-treatment="ignore-if-surrounding-linefeed"  hyphenate="true" language="en"  padding-bottom="0.0pt" start-indent="14.23pt" end-indent="14.23pt" padding-top="598.08pt" width="569.06pt"  height="36.99pt" ><xsl:variable name="Firmenfarbe_h1_Titel">
 <xsl:choose>
@@ -175,8 +193,7 @@
 			<xsl:text>Gesamtklauselpaket</xsl:text>
 		</xsl:if>
 	</fo:inline>
-</fo:block>
-</fo:block>
+</fo:block></fo:block>
 </fo:block-container>
 <fo:block-container display-align="before" reference-orientation="0">
 <fo:block position="relative" text-align="center" color="rgb-icc(0,0,0, #CMYK, 0.65,0.53,0.51,1.0)" font-family="Calibri" font-size="16.0pt" white-space-collapse="false"  linefeed-treatment="preserve" white-space-treatment="ignore-if-surrounding-linefeed"  hyphenate="true" language="en"  padding-bottom="0.0pt" start-indent="0.0pt" end-indent="0.0pt" padding-top="0.0pt" padding="0.0pt" width="569.0pt"  height="21.0pt" ><fo:block space-after="6pt" font-family="Calibri" font-size="16pt">
@@ -200,56 +217,70 @@
 </fo:page-sequence>
 <fo:page-sequence master-reference="masterNamePageMain1" format="1">
 <xsl:attribute name="force-page-count">no-force</xsl:attribute>
-<!--
 <fo:static-content flow-name="xsl-region-before">
-<fo:block-container display-align="before" reference-orientation="0">
-<fo:block position="relative" text-align="start" color="rgb-icc(0,0,0, #CMYK, 0.65,0.53,0.51,1.0)" font-family="Calibri" font-size="11.0pt" white-space-collapse="false"  linefeed-treatment="preserve" white-space-treatment="ignore-if-surrounding-linefeed"  hyphenate="true" language="en"  padding-bottom="0.0pt" start-indent="0.0pt" end-indent="0.0pt" padding-top="0.0pt" padding="0.0pt" width="100.0pt"  height="30.0pt" ><xsl:choose>
-<xsl:when test="NS1:item[@NS1:name='branding']/@NS1:value = 'GrECo'">
+<fo:block-container position="fixed"  z-index="-1"  display-align="before" reference-orientation="0">
+<fo:block position="relative" text-align="start" color="rgb-icc(0,0,0, #CMYK, 0.65,0.53,0.51,1.0)" font-family="Calibri" font-size="11.0pt" white-space-collapse="false"  linefeed-treatment="preserve" white-space-treatment="ignore-if-surrounding-linefeed"  hyphenate="true" language="en"  padding-bottom="0.0pt" start-indent="0.0pt" end-indent="0.0pt" padding-top="0.0pt" padding="0.0pt" width="100.0pt"  height="30.0pt" ><!--
+<xsl:if test="NS1:item[@NS1:name='branding']/@NS1:value = 'GrECo'">
    <fo:block absolute-position="absolute" top="0cm" left="0cm">
 	    <fo:external-graphic src="url({concat($common_img,'Folgeseite_GrECo.jpg')})" content-width="21.12cm" />
    </fo:block>
-</xsl:when>
+</xsl:if>
 
-<xsl:when test="NS1:item[@NS1:name='branding']/@NS1:value = 'VMG'">
+<xsl:if test="NS1:item[@NS1:name='branding']/@NS1:value = 'VMG'">
    <fo:block absolute-position="absolute" top="0cm" left="0cm">
 	    <fo:external-graphic src="url({concat($common_img,'Folgeseite_VMG.jpg')})" content-width="21.12cm" />
    </fo:block>
-</xsl:when>
+</xsl:if>
 
-<xsl:when test="NS1:item[@NS1:name='branding']/@NS1:value = 'BA-CA'">
+<xsl:if test="NS1:item[@NS1:name='branding']/@NS1:value = 'BA-CA'">
    <fo:block absolute-position="absolute" top="0cm" left="0cm">
 	    <fo:external-graphic src="url({concat($common_img,'Folgeseite_BACA.jpg')})" content-width="21.12cm" />
    </fo:block>
-</xsl:when>
+</xsl:if>
 
-<xsl:when test="NS1:item[@NS1:name='branding']/@NS1:value = 'EGHV'">
+<xsl:if test="NS1:item[@NS1:name='branding']/@NS1:value = 'EGHV'">
    <fo:block absolute-position="absolute" top="0cm" left="0cm">
 	    <fo:external-graphic src="url({concat($common_img,'Folgeseite_EGHV.jpg')})" content-width="21.12cm" />
    </fo:block>
-</xsl:when>
+</xsl:if>
 
-<xsl:when test="NS1:item[@NS1:name='branding']/@NS1:value = 'GJRC'">
+<xsl:if test="NS1:item[@NS1:name='branding']/@NS1:value = 'GJRC'">
    <fo:block absolute-position="absolute" top="0cm" left="0cm">
 	    <fo:external-graphic src="url({concat($common_img,'Folgeseite_GrECo.jpg')})" content-width="21.12cm" />
    </fo:block>
-</xsl:when>
+</xsl:if>
 
-<xsl:when test="NS1:item[@NS1:name='branding']/@NS1:value = 'CMV'">
+<xsl:if test="NS1:item[@NS1:name='branding']/@NS1:value = 'CMV'">
    <fo:block absolute-position="absolute" top="0cm" left="0cm">
 	    <fo:external-graphic src="url({concat($common_img,'Folgeseite_CMV.jpg')})" content-width="21.12cm" />
    </fo:block>
-</xsl:when>
+</xsl:if>
+-->
+<xsl:if test="NS1:item[@NS1:name='branding']/@NS1:value = 'GrECo'">
+	    <fo:external-graphic src="url({concat($common_img,'Folgeseite_GrECo.jpg')})"  />
+</xsl:if>
 
-<xsl:otherwise>
-	<fo:block absolute-position="absolute" top="0cm" left="0cm">
-	    <fo:external-graphic src="url({concat($common_img,'Folgeseite_GrECo.jpg')})" content-width="21.12cm" />
-	</fo:block>
-</xsl:otherwise>
+<xsl:if test="NS1:item[@NS1:name='branding']/@NS1:value = 'VMG'">
+	    <fo:external-graphic src="url({concat($common_img,'Folgeseite_VMG.jpg')})"  />
+</xsl:if>
 
-</xsl:choose></fo:block>
+<xsl:if test="NS1:item[@NS1:name='branding']/@NS1:value = 'BA-CA'">
+	    <fo:external-graphic src="url({concat($common_img,'Folgeseite_BACA.jpg')})"  />
+</xsl:if>
+
+<xsl:if test="NS1:item[@NS1:name='branding']/@NS1:value = 'EGHV'">
+	    <fo:external-graphic src="url({concat($common_img,'Folgeseite_EGHV.jpg')})"  />
+</xsl:if>
+
+<xsl:if test="NS1:item[@NS1:name='branding']/@NS1:value = 'GJRC'">
+	    <fo:external-graphic src="url({concat($common_img,'Folgeseite_GrECo.jpg')})"  />
+</xsl:if>
+
+<xsl:if test="NS1:item[@NS1:name='branding']/@NS1:value = 'CMV'">
+	    <fo:external-graphic src="url({concat($common_img,'Folgeseite_CMV.jpg')})" />
+</xsl:if></fo:block>
 </fo:block-container>
 </fo:static-content>
--->
 <fo:static-content flow-name="xsl-region-after">
 <fo:block-container position="absolute" top="28.5pt" left="256.36pt" height="22.76pt" width="85.36pt" display-align="after" reference-orientation="0" fox:transform="rotate(0) , translate(0, 0)">
 <fo:block text-align="center" color="rgb-icc(0,0,0, #CMYK, 0.65,0.53,0.51,1.0)" font-family="Calibri" font-size="8.0pt" padding-bottom="0.0pt" start-indent="0.0pt" end-indent="0.0pt" padding-top="0.0pt" padding="0.0pt" position="relative" height="22.76pt" width="85.36pt" keep-together="auto"  white-space-collapse="false"  linefeed-treatment="preserve" white-space-treatment="ignore-if-surrounding-linefeed"  hyphenate="true" language="en" ><xsl:if test="NS1:item[@NS1:name='branding']/@NS1:value='VMG'">
@@ -638,52 +669,67 @@
 <fo:page-sequence master-reference="masterNamePageOther2" format="1">
 <xsl:attribute name="force-page-count">no-force</xsl:attribute>
 <fo:static-content flow-name="xsl-region-before">
-<fo:block-container position="absolute" top="-2.85pt" left="0.0pt" height="142.26pt" width="284.53pt" display-align="before" reference-orientation="0" fox:transform="rotate(0) , translate(0, 0)">
-<fo:block text-align="start" color="rgb-icc(0,0,0, #CMYK, 0.65,0.53,0.51,1.0)" font-family="Calibri" font-size="11.0pt" padding-bottom="0.0pt" start-indent="0.0pt" end-indent="0.0pt" padding-top="0.0pt" padding="0.0pt" position="relative" height="142.26pt" width="284.53pt" keep-together="auto"  white-space-collapse="false"  linefeed-treatment="preserve" white-space-treatment="ignore-if-surrounding-linefeed"  hyphenate="true" language="en" ><xsl:choose>
-
-<xsl:when test="NS1:item[@NS1:name='branding']/@NS1:value = 'GrECo'">
+<fo:block-container position="fixed"  z-index="-1"  display-align="before" reference-orientation="0">
+<fo:block position="relative" text-align="start" color="rgb-icc(0,0,0, #CMYK, 0.65,0.53,0.51,1.0)" font-family="Calibri" font-size="11.0pt" white-space-collapse="false"  linefeed-treatment="preserve" white-space-treatment="ignore-if-surrounding-linefeed"  hyphenate="true" language="en"  padding-bottom="0.0pt" start-indent="0.0pt" end-indent="0.0pt" padding-top="0.0pt" padding="0.0pt" width="284.53pt"  height="142.26pt" ><!--
+<xsl:if test="NS1:item[@NS1:name='branding']/@NS1:value = 'GrECo'">
    <fo:block absolute-position="absolute" top="0cm" left="0cm">
 	    <fo:external-graphic src="url({concat($common_img,'Endseite_GrECo.jpg')})" content-height="29.85cm" />
    </fo:block>
-</xsl:when>
+</xsl:if>
 
-<xsl:when test="NS1:item[@NS1:name='branding']/@NS1:value = 'VMG'">
+<xsl:if test="NS1:item[@NS1:name='branding']/@NS1:value = 'VMG'">
    <fo:block absolute-position="absolute" top="0cm" left="0cm">
 	    <fo:external-graphic src="url({concat($common_img,'Endseite_VMG.jpg')})" content-height="29.85cm" />
    </fo:block>
-</xsl:when>
+</xsl:if>
 
-<xsl:when test="NS1:item[@NS1:name='branding']/@NS1:value = 'BA-CA'">
+<xsl:if test="NS1:item[@NS1:name='branding']/@NS1:value = 'BA-CA'">
    <fo:block absolute-position="absolute" top="0cm" left="0cm">
 	    <fo:external-graphic src="url({concat($common_img,'Endseite_BACA.jpg')})" content-height="29.85cm" />
    </fo:block>
-</xsl:when>
+</xsl:if>
 
-<xsl:when test="NS1:item[@NS1:name='branding']/@NS1:value = 'EGHV'">
+<xsl:if test="NS1:item[@NS1:name='branding']/@NS1:value = 'EGHV'">
    <fo:block absolute-position="absolute" top="0cm" left="0cm">
 	    <fo:external-graphic src="url({concat($common_img,'Endseite_EGHV.jpg')})" content-height="29.85cm" />
    </fo:block>
-</xsl:when>
+</xsl:if>
 
-<xsl:when test="NS1:item[@NS1:name='branding']/@NS1:value = 'GJRC'">
+<xsl:if test="NS1:item[@NS1:name='branding']/@NS1:value = 'GJRC'">
    <fo:block absolute-position="absolute" top="0cm" left="0cm">
 	    <fo:external-graphic src="url({concat($common_img,'Endseite_GrECo.jpg')})" content-height="29.85cm" />
    </fo:block>
-</xsl:when>
+</xsl:if>
 
-<xsl:when test="NS1:item[@NS1:name='branding']/@NS1:value = 'CMV'">
+<xsl:if test="NS1:item[@NS1:name='branding']/@NS1:value = 'CMV'">
    <fo:block absolute-position="absolute" top="0cm" left="0cm">
 	    <fo:external-graphic src="url({concat($common_img,'Endseite_CMV.jpg')})" content-height="29.85cm" />
    </fo:block>
-</xsl:when>
+</xsl:if>
+-->
+<xsl:if test="NS1:item[@NS1:name='branding']/@NS1:value = 'GrECo'">
+	    <fo:external-graphic src="url({concat($common_img,'Endseite_GrECo.jpg')})"  />
+</xsl:if>
 
-<xsl:otherwise>
-	<fo:block absolute-position="absolute" top="0cm" left="0cm">
-	    <fo:external-graphic src="url({concat($common_img,'Endseite_GrECo.jpg')})" content-height="29.85cm" />
-	</fo:block>
-</xsl:otherwise>
+<xsl:if test="NS1:item[@NS1:name='branding']/@NS1:value = 'VMG'">
+	    <fo:external-graphic src="url({concat($common_img,'Endseite_VMG.jpg')})"  />
+</xsl:if>
 
-</xsl:choose></fo:block>
+<xsl:if test="NS1:item[@NS1:name='branding']/@NS1:value = 'BA-CA'">
+	    <fo:external-graphic src="url({concat($common_img,'Endseite_BACA.jpg')})"  />
+</xsl:if>
+
+<xsl:if test="NS1:item[@NS1:name='branding']/@NS1:value = 'EGHV'">
+	    <fo:external-graphic src="url({concat($common_img,'Endseite_EGHV.jpg')})"  />
+</xsl:if>
+
+<xsl:if test="NS1:item[@NS1:name='branding']/@NS1:value = 'GJRC'">
+	    <fo:external-graphic src="url({concat($common_img,'Endseite_GrECo.jpg')})"  />
+</xsl:if>
+
+<xsl:if test="NS1:item[@NS1:name='branding']/@NS1:value = 'CMV'">
+	    <fo:external-graphic src="url({concat($common_img,'Endseite_CMV.jpg')})" />
+</xsl:if></fo:block>
 </fo:block-container>
 </fo:static-content>
 <fo:static-content flow-name="xsl-region-after">
