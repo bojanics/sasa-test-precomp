@@ -23,8 +23,6 @@ using Org.BouncyCastle.Pkcs;
 using ibex4;
 using ibex4.logging;
 
-static APEngine engine = new APEngine(true);
-
 public static async Task<HttpResponseMessage> Run(HttpRequestMessage req, TraceWriter log, ExecutionContext context)
 {
     log.Info("Starting creation of PDF...");
