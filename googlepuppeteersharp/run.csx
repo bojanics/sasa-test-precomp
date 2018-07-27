@@ -396,7 +396,7 @@ private static ParamInfo handleParameter(JObject json, JObject config_json, stri
     // handle DEFAULT setting
     if (!paramResolved)
     {
-        string config_DEFAULT_SettingOrConnectionStringName = "PDFGEN_DEFAULT_" + name;
+        string config_DEFAULT_SettingOrConnectionStringName = "HTML2PDF_DEFAULT_" + name;
         string v = null;
         if (isSetting)
         {
