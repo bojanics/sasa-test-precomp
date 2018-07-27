@@ -1,0 +1,22 @@
+{  
+   "html":"http://google.com",
+   "html_SettingName":"SOME_html_REMOTE",
+   "signPDF":true,
+   "signPDF_SettingName":"SOME_signPDF",
+   "signPDFReason":"My test reason",
+   "signPDFReason_SettingName":"SOME_signPDFReason",
+   "signPDFLocation":"My test location",
+   "signPDFLocation_SettingName":"SOME_signPDFLocation",
+   "signPDFContact":"My test contact",
+   "signPDFContact_SettingName":"SOME_signPDFContact",
+   "signPDFHashAlgorithm":"SHA-1",
+   "signPDFHashAlgorithm_SettingName":"SOME_signPDFHashAlgorithm",
+   "certificateFile":"./defaults/default.pfx",
+   "certificateFile_SettingName":"SOME_certificateFile_LOCAL",
+   "certificatePassword":"password",
+   "certificatePassword_ConnectionStringName":"SOME_certificatePassword_LOCAL",
+   "lockPDF":false,
+   "lockPDF_SettingName":"SOME_lockPDF",
+   "lockPDFPassword":"password",
+   "lockPDFPassword_ConnectionStringName":"SOME_lockPDFPassword"
+}
