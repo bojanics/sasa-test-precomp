@@ -2,6 +2,7 @@
 #r "System.Configuration"
 #r "PuppeteerSharp.dll"
 #r "itextsharp.dll"
+#r "netstandard.dll"
 
 using System.Net;
 using System.Net.Http;
