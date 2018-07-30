@@ -594,7 +594,7 @@ private static void DigiSignPdf(byte[] source,
     bool isVisibleSignature)
 {
     // reader and stamper
-    PdfReader.unethicalreading = true; // must be set in order to work with AltSoft
+    //PdfReader.unethicalreading = true; // must be set in order to work with AltSoft
     PdfReader reader = new PdfReader(source);
     PdfStamper stamper = null;
     if (signPdf)
