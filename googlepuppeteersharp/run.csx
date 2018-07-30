@@ -18,7 +18,6 @@ using System.Text;
 using Newtonsoft.Json.Linq;
 using System.Threading.Tasks;
 using iTextSharp.text.pdf;
-using iTextSharp.text.pdf.security;
 using Org.BouncyCastle.Pkcs;
 
 using PuppeteerSharp;
@@ -560,7 +559,6 @@ private static void DigiSignPdf(byte[] source,
             }
         }
         var pk = pk12.GetKey(alias).Key;
-        IExternalSignature es = new PrivateKeySignature(pk, digestAlgorithm);
 
         // appearance
         PdfSignatureAppearance appearance = stamper.SignatureAppearance;
@@ -574,11 +572,10 @@ private static void DigiSignPdf(byte[] source,
         }
         // digital signature
 
-        MakeSignature.SignDetached(appearance, es, new Org.BouncyCastle.X509.X509Certificate[] { pk12.GetCertificate(alias).Certificate }, null, null, null, 0, CryptoStandard.CMS);
+        appearance.SetCrypto(pk, new Org.BouncyCastle.X509.X509Certificate[] { pk12.GetCertificate(alias).Certificate }, null, PdfSignatureAppearance.WINCER_SIGNED);
     }
     stamper.Close();
     reader.Close();
-    reader.Dispose();
 }
 
 public class ParamInfo

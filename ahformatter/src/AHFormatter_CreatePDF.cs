@@ -13,7 +13,6 @@ using System.Collections.Generic;
 using Newtonsoft.Json;
 using System.Text;
 using iTextSharp.text.pdf;
-using iTextSharp.text.pdf.security;
 using Newtonsoft.Json.Linq;
 using Org.BouncyCastle.Pkcs;
 
@@ -79,6 +78,7 @@ namespace AHFormatter_CreatePDF
                 body = req.Content.ReadAsStringAsync().Result;
                 if (body != null)
                 {
+                    //log.Info("Body=" + body);
                     try
                     {
                         json = JsonConvert.DeserializeObject(body);
@@ -651,7 +651,6 @@ namespace AHFormatter_CreatePDF
                     }
                 }
                 var pk = pk12.GetKey(alias).Key;
-                IExternalSignature es = new PrivateKeySignature(pk, digestAlgorithm);
 
                 // appearance
                 PdfSignatureAppearance appearance = stamper.SignatureAppearance;
@@ -664,12 +663,10 @@ namespace AHFormatter_CreatePDF
                     appearance.SetVisibleSignature(new iTextSharp.text.Rectangle(20, 10, 170, 60), reader.NumberOfPages, null);
                 }
                 // digital signature
-
-                MakeSignature.SignDetached(appearance, es, new Org.BouncyCastle.X509.X509Certificate[] { pk12.GetCertificate(alias).Certificate }, null, null, null, 0, CryptoStandard.CMS);
+                appearance.SetCrypto(pk, new Org.BouncyCastle.X509.X509Certificate[] { pk12.GetCertificate(alias).Certificate }, null, PdfSignatureAppearance.WINCER_SIGNED);
             }
             stamper.Close();
             reader.Close();
-            reader.Dispose();
         }
 
     }
