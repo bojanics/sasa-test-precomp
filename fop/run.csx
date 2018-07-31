@@ -75,19 +75,33 @@ public static async Task<HttpResponseMessage> Run(HttpRequestMessage req, TraceW
                 throw new Exception("Invalid JSON body! "+ex.Message, ex);
             }
         }
-        string Configuration = null;
+
+        // Check if language is set by normal/setting parameter
+        string lang = null;
         try
         {
-            Configuration = json.Configuration;
+            lang = json.lang;
         }
         catch (Exception ex) { }
-        string Configuration_SettingName = null;
-        try
+        if (lang == null)
         {
-            Configuration_SettingName = json.Configuration_SettingName;
-        }
-        catch (Exception ex)
-        {
+            string lang_SettingName = null;
+            try
+            {
+                lang_SettingName = json.lang_SettingName;
+            }
+            catch (Exception ex)
+            {
+            }
+            if (lang_SettingName != null)
+            {
+                string vv = System.Environment.GetEnvironmentVariable(lang_SettingName);
+                if (vv != null)
+                {
+                    lang = vv;
+                }
+            }
+
         }
 
         // byte[] of resulting PDF
@@ -95,8 +109,7 @@ public static async Task<HttpResponseMessage> Run(HttpRequestMessage req, TraceW
 
         string firstErrorMsg = null;
         // Determine value of all the parameters using request parameters, default settings and code default and also update pdfinfo response
-        ParamInfo Configuration_transf = handleParameter(json, null, "Configuration", true, rootloc, null, log);
-        AddResponseParam(pdfInfo, Configuration_transf, false, false);
+        ParamInfo Configuration_transf = handleParameter(json, null, "Configuration", true, rootloc, null, lang, log);
         dynamic config_json = null;
         if (Configuration_transf.value != null)
         {
@@ -109,41 +122,75 @@ public static async Task<HttpResponseMessage> Run(HttpRequestMessage req, TraceW
                 }
                 catch (Exception ex)
                 {
-                    if (firstErrorMsg == null)
-                    {
-                        firstErrorMsg = "PDF will not be generated because the following error occurred when trying to download configuration file: " + ex.Message;
-                    }
+                    firstErrorMsg = "PDF will not be generated because the following error occurred when trying to download configuration file: " + ex.Message;
                 }
             }
         }
+        // if language was not set by normal/setting parameters, check in Configuration and default settings
+        if (lang == null)
+        {
+            ParamInfo lang_transf = handleParameter(json, config_json, "lang", true, null, null, null, log);
+            lang = lang_transf.value;
+            // if Configuration JSON came from DEFAULT settings, check if there was a lang in default settings and use that value if not null
+            if (Configuration_transf.source==5)
+            {
+                string vv = System.Environment.GetEnvironmentVariable("PDFGEN_DEFAULT_lang");
+                if (vv != null)
+                {
+                    lang = vv;
+                    // now handle Configuration again with the language parameter
+                    firstErrorMsg = null;
+                    Configuration_transf = handleParameter(json, null, "Configuration", true, rootloc, null, lang, log);
+                    if (Configuration_transf.value != null)
+                    {
+                        using (WebClient wclient = new WebClient())
+                        {
+                            try
+                            {
+                                string config_str = wclient.DownloadString(Configuration_transf.value);
+                                config_json = JsonConvert.DeserializeObject(config_str);
+                            }
+                            catch (Exception ex)
+                            {
+                                firstErrorMsg = "PDF will not be generated because the following error occurred when trying to download configuration file: " + ex.Message;
+                            }
+                        }
+                    }
 
-        ParamInfo xsl_transf = handleParameter(json,config_json,"xsl", true, rootloc, DEFAULT_xsl_CODE, log);
+                }
+            }
+        }                
+        pdfInfo.Add("lang", lang);
+        
+        AddResponseParam(pdfInfo, Configuration_transf, false, false);
+
+        ParamInfo xsl_transf = handleParameter(json,config_json,"xsl", true, rootloc, DEFAULT_xsl_CODE, lang, log);
         AddResponseParam(pdfInfo, xsl_transf, false, false);
-        ParamInfo xslPre_transf = handleParameter(json, config_json, "xslPre", true, rootloc, null, log);
+        ParamInfo xslPre_transf = handleParameter(json, config_json, "xslPre", true, rootloc, null, lang, log);
         AddResponseParam(pdfInfo, xslPre_transf, false, false);
-        ParamInfo PDFTemplate_transf = handleParameter(json, config_json, "PDFTemplate", true, rootloc, null, log);
+        ParamInfo PDFTemplate_transf = handleParameter(json, config_json, "PDFTemplate", true, rootloc, null, lang, log);
         AddResponseParam(pdfInfo, PDFTemplate_transf, false, false);
-        ParamInfo signPDF_transf = handleParameter(json, config_json, "signPDF", true, null, DEFAULT_signPDF_CODE, log);
+        ParamInfo signPDF_transf = handleParameter(json, config_json, "signPDF", true, null, DEFAULT_signPDF_CODE, null, log);
         AddResponseParam(pdfInfo, signPDF_transf, false, true);
         bool doSigning = Boolean.Parse(signPDF_transf.value);
 
-        ParamInfo signPDFReason_transf = signPDFReason_transf = handleParameter(json, config_json, "signPDFReason", true, null, null, log);
+        ParamInfo signPDFReason_transf = signPDFReason_transf = handleParameter(json, config_json, "signPDFReason", true, null, null, null, log);
         AddResponseParam(pdfInfo, signPDFReason_transf, false, false);
-        ParamInfo signPDFLocation_transf = handleParameter(json, config_json, "signPDFLocation", true, null, null, log);
+        ParamInfo signPDFLocation_transf = handleParameter(json, config_json, "signPDFLocation", true, null, null, null, log);
         AddResponseParam(pdfInfo, signPDFLocation_transf, false, false);
-        ParamInfo signPDFContact_transf = handleParameter(json, config_json, "signPDFContact", true, null, null, log);
+        ParamInfo signPDFContact_transf = handleParameter(json, config_json, "signPDFContact", true, null, null, null, log);
         AddResponseParam(pdfInfo, signPDFContact_transf, false, false);
-        ParamInfo signPDFHashAlgorithm_transf = handleParameter(json, config_json, "signPDFHashAlgorithm", true, null, DEFAULT_signPDFHashAlgorithm_CODE, log);
+        ParamInfo signPDFHashAlgorithm_transf = handleParameter(json, config_json, "signPDFHashAlgorithm", true, null, DEFAULT_signPDFHashAlgorithm_CODE, null, log);
         AddResponseParam(pdfInfo, signPDFHashAlgorithm_transf, false, false);
-        ParamInfo certificateFile_transf = handleParameter(json, config_json, "certificateFile", true, rootloc, DEFAULT_certificateFile_CODE, log);
+        ParamInfo certificateFile_transf = handleParameter(json, config_json, "certificateFile", true, rootloc, DEFAULT_certificateFile_CODE, null, log);
         AddResponseParam(pdfInfo, certificateFile_transf, false, false);
-        ParamInfo certificatePassword_transf = handleParameter(json, config_json, "certificatePassword", false, null, DEFAULT_certificatePassword_CODE, log);
+        ParamInfo certificatePassword_transf = handleParameter(json, config_json, "certificatePassword", false, null, DEFAULT_certificatePassword_CODE, null, log);
         AddResponseParam(pdfInfo, certificatePassword_transf, true, false);
 
-        ParamInfo lockPDF_transf = handleParameter(json, config_json, "lockPDF", true, null, DEFAULT_lockPDF_CODE, log);
+        ParamInfo lockPDF_transf = handleParameter(json, config_json, "lockPDF", true, null, DEFAULT_lockPDF_CODE, null, log);
         AddResponseParam(pdfInfo, lockPDF_transf, false, true);
         bool doLocking = Boolean.Parse(lockPDF_transf.value);
-        ParamInfo lockPDFPassword_transf = handleParameter(json, config_json, "lockPDFPassword", false, null, DEFAULT_lockPDFPassword_CODE, log);
+        ParamInfo lockPDFPassword_transf = handleParameter(json, config_json, "lockPDFPassword", false, null, DEFAULT_lockPDFPassword_CODE, null, log);
         AddResponseParam(pdfInfo, lockPDFPassword_transf, true, false);
 
         if (firstErrorMsg != null)
@@ -336,7 +383,7 @@ private static void AddResponseParam(JObject pdfinfo, ParamInfo param, bool isPa
     }
 }
 
-private static ParamInfo handleParameter(JObject json, JObject config_json, string name, Boolean isSetting, string rootloc, string defaultVal, TraceWriter log)
+private static ParamInfo handleParameter(JObject json, JObject config_json, string name, Boolean isSetting, string rootloc, string defaultVal, string lang, TraceWriter log)
 {
     ParamInfo ret = new ParamInfo();
     bool paramResolved = false;
@@ -479,6 +526,30 @@ private static ParamInfo handleParameter(JObject json, JObject config_json, stri
             ret.source = 6;
         }
     }
+
+    // handle language (modify the result if the language parameter exists)
+    if (lang!=null && ret.value!=null)
+    {
+        string val = ret.value;
+        val = val.Replace("\\", "/");
+        int index_dot = val.LastIndexOf(".");
+        int index_slash = val.LastIndexOf("/");
+
+        if (index_dot > 0 && index_dot > index_slash)
+        {
+            // if there is a dot and it is after slash or backslash
+            string prefix = ret.value.Substring(0, index_dot);
+            string suffix = ret.value.Substring(index_dot);
+            ret.value = $"{prefix}_{lang}{suffix}";
+        }
+        else
+        {
+            // if there is no dot
+            ret.value = ret.value + $"_{lang}";
+        }
+        ret.orig_value = ret.value;
+    }
+            
     // Resolve relative paths if neccessary
     if (ret.value != null)
     {
