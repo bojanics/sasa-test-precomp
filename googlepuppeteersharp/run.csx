@@ -190,7 +190,7 @@ public static async Task<HttpResponseMessage> Run(HttpRequestMessage req, TraceW
         }
 
 
-        pdfByteArray = doPDFGen(html_transf.value, log).Result;
+        pdfByteArray = await doPDFGen(html_transf.value, log);
 
         // if PDF should be signed or locked
         if (doSigning || doLocking)
@@ -537,15 +537,16 @@ private static async Task<byte[]> doPDFGen(string html, TraceWriter log)
     try
     {
 
-        var options = new ConnectOptions()
+        var options = new LaunchOptions
         {
-            BrowserWSEndpoint = $"wss://chrome.browserless.io/..."
+            Headless = true
         };
 
+        await Downloader.CreateDefault().DownloadRevisionAsync(Downloader.DefaultRevision);
 
         byte[] pdfBytes = null;
 
-        using (var browser = await PuppeteerSharp.Puppeteer.ConnectAsync(options))
+        using (var browser = await PuppeteerSharp.Puppeteer.LaunchAsync(options, Downloader.DefaultRevision))
         {
             using (var page = await browser.NewPageAsync())
             {
