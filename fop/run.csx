@@ -17,6 +17,7 @@ using System.Collections.Generic;
 using Newtonsoft.Json;
 using System.Text;
 using iTextSharp.text.pdf;
+using iTextSharp.text;
 using Newtonsoft.Json.Linq;
 using Org.BouncyCastle.Pkcs;
 
@@ -29,6 +30,17 @@ using java.net;
 using org.apache.fop.fonts;
 using org.apache.fop.apps.io;
 using org.apache.avalon.framework.configuration;
+
+private static string APP_SETTING_DEVOPS_NAME = "ENVIRONMENT_DEVOPS";
+private static string APP_SETTING_DEVOPS_PRODVAL = "prd";
+private static string APP_SETTING_LANE_NAME = "ENVIRONMENT_LANE";
+private static string APP_SETTING_LANE_PRODVAL = "liv";
+private static string APP_SETTING_STEP_NAME = "ENVIRONMENT_STEP";
+private static string APP_SETTING_STEP_PRODVAL = "rel";
+private static string APP_SETTING_SPEED_NAME = "ENVIRONMENT_SPEED";
+private static string APP_SETTING_SPEED_PRODVAL = "all";
+private static string APP_SETTING_REGION_NAME = "ENVIRONMENT_REGION";
+private static string APP_SETTING_SLOT_NAME = "ENVIRONMENT_SLOT";
 
 public static async Task<HttpResponseMessage> Run(HttpRequestMessage req, TraceWriter log, ExecutionContext context)
 {
@@ -246,6 +258,15 @@ public static async Task<HttpResponseMessage> Run(HttpRequestMessage req, TraceW
             }
             //log.Info("XMLAFT=" + xml);
             pdfByteArray = doPDFGen(xml, xsl_transf.value, rootloc, log);
+        }
+
+        WatermarkInfo wmInfo = getWatermarkInfo();
+        log.Info("Watermark length=" + wmInfo.text.Length);
+        if (wmInfo.visible)
+        {
+            MemoryStream ss = new MemoryStream();
+            setWatermark(pdfByteArray,ss,wmInfo.text);
+            pdfByteArray = ss.ToArray();
         }
 
         // if PDF should be signed or locked or it is from the template so must be filled-in with the parameters from the request
@@ -729,6 +750,102 @@ private static void DigiSignPdf(byte[] source,
     reader.Close();
 }
 
+private static WatermarkInfo getWatermarkInfo()
+{
+    WatermarkInfo wmInfo = new WatermarkInfo();
+    wmInfo.text = null;
+    wmInfo.visible = false;
+
+    updateWatermarkInfo(wmInfo, APP_SETTING_DEVOPS_NAME,APP_SETTING_DEVOPS_PRODVAL);
+    updateWatermarkInfo(wmInfo, APP_SETTING_LANE_NAME, APP_SETTING_LANE_PRODVAL);
+    updateWatermarkInfo(wmInfo, APP_SETTING_STEP_NAME, APP_SETTING_STEP_PRODVAL);
+    updateWatermarkInfo(wmInfo, APP_SETTING_SPEED_NAME, APP_SETTING_SPEED_PRODVAL);
+    updateWatermarkInfo(wmInfo, APP_SETTING_REGION_NAME, null);
+    updateWatermarkInfo(wmInfo, APP_SETTING_SLOT_NAME, null);
+
+    return wmInfo;
+}
+
+private static void updateWatermarkInfo(WatermarkInfo wmInfo,string settingName,string defVal)
+{
+    string v = System.Environment.GetEnvironmentVariable(settingName);
+    if (v == null)
+    {
+        v = settingName;
+        wmInfo.visible = true;
+    } else
+    {
+        if (defVal!=null && !v.Equals(defVal))
+        {
+            wmInfo.visible = true;
+        }
+    }
+    if (wmInfo.text==null)
+    {
+        wmInfo.text = "";
+    } else
+    {
+        wmInfo.text += "-";
+    }
+    wmInfo.text += v;
+}
+        
+private static void setWatermark(byte[] source,Stream destinationStream,string watermark)
+{
+
+    // read pdf
+    PdfReader reader = new PdfReader(source);
+    PdfStamper stamper = new PdfStamper(reader, destinationStream);
+
+    // text watermark
+    iTextSharp.text.Font FONT1 = new iTextSharp.text.Font(iTextSharp.text.Font.HELVETICA, 34, iTextSharp.text.Font.BOLD, new Color(255, 0, 0));
+    int mfs = 8;
+    if (watermark.Length<=30)
+    {
+        mfs = 26;
+    } else if (watermark.Length<=42)
+    {
+        mfs = 18;
+    }
+    else if (watermark.Length <= 60)
+    {
+        mfs = 12;
+    }
+    iTextSharp.text.Font FONT2 = new iTextSharp.text.Font(iTextSharp.text.Font.HELVETICA, mfs, iTextSharp.text.Font.BOLD, new Color(255, 0, 0));
+    Phrase p1 = new Phrase("TEST ENVIRONMENT INFO:", FONT1);
+    Phrase p2 = new Phrase(watermark, FONT2);
+
+    // properties
+    PdfContentByte over;
+    Rectangle pagesize;
+    float x, y;
+
+    // loop over every page
+    int n = reader.NumberOfPages;
+    for (int i = 1; i <= n; i++)
+    {
+
+        // get page size and position
+        pagesize = reader.GetPageSizeWithRotation(i);
+        x = (pagesize.Left + pagesize.Right) / 2;
+        y = (pagesize.Top + pagesize.Bottom) / 2;
+        over = stamper.GetOverContent(i);
+        over.SaveState();
+
+        // set transparency
+        PdfGState state = new PdfGState();
+        state.FillOpacity = 0.5f;
+        over.SetGState(state);
+
+        ColumnText.ShowTextAligned(over, Element.ALIGN_CENTER, p1, x, y+13, 0);
+        ColumnText.ShowTextAligned(over, Element.ALIGN_CENTER, p2, x, y-13, 0);
+        over.RestoreState();
+    }
+    stamper.Close();
+    reader.Close();
+}
+
+
 public class ParamInfo
 {
     public string name { get; set; }
@@ -736,4 +853,10 @@ public class ParamInfo
     public string orig_value { get; set; }
     public bool isSetting { get; set; }
     public int source { get; set; }
+}
+
+public class WatermarkInfo
+{
+    public string text { get; set; }
+    public bool visible { get; set; }
 }
