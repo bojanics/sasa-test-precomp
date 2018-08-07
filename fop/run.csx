@@ -261,7 +261,7 @@ public static async Task<HttpResponseMessage> Run(HttpRequestMessage req, TraceW
         }
 
         WatermarkInfo wmInfo = getWatermarkInfo();
-        log.Info("Watermark length=" + wmInfo.text.Length);
+        //log.Info("Watermark length=" + wmInfo.text.Length);
         if (wmInfo.visible)
         {
             MemoryStream ss = new MemoryStream();
