@@ -593,7 +593,7 @@ private static byte[] setWatermark(byte[] source, string watermark,TraceWriter l
         int ibhe = filestr.IndexOf(">", ibhs + 5);
         if (ibhs > 0 && ibhe > ibhs)
         {
-            filestr = filestr.Substring(0, ihtmlte + 1) + "\n<title>TEST ENVIRONMENT INFORMATION: " + watermark + "</title>" + filestr.Substring(ihtmlte + 1);
+            filestr = filestr.Substring(0, ibhe + 1) + "\n<title>TEST ENVIRONMENT INFORMATION: " + watermark + "</title>" + filestr.Substring(ibhe + 1);
         }
         else
         {
