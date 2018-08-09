@@ -12,7 +12,7 @@ Registration information
         Last Name
         %last_name%
 
-    	Date of Birth
+        Date of Birth
         %date_of_birth%
 
         Email 
@@ -24,13 +24,13 @@ Registration information
         Telephone
         %phone%
 
-		Shoesize
+        Shoesize
         %shoe_size%
 
         Is Adult?
         %is_adult%
-		
-		Car
+        
+        Car
         Audi Mercedes Saab Volvo
 
         Registration type
