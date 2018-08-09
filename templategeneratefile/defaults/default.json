@@ -1,0 +1,32 @@
+{  
+   "data":{  
+      "first_name":"John",
+      "last_name":"Doe",
+      "date_of_birth":"11.11.1999",
+      "email":"jonh.doe@gmail.com",
+      "url":"http://www.google.com",
+      "phone":"+1896535782",
+      "shoe_size":9,
+      "is_adult_checked":"checked",
+      "is_reg_business_checked":"",
+      "is_reg_student_checked":"checked",
+      "is_reg_personal_checked":"",
+      "address":"Boulevard of Broken Dreams",
+      "post_code":"2222",
+      "country":"US",
+      "is_adult":"yes",
+      "registration_type":"Student"
+   },
+   "search_replace_data" : {
+      "http://www.google.com":"http://www.yahoo.com",
+      "11111111-2222-3333-4444-555555555555": "e4fff5ac-5dc1-4a8a-9760-9c6782847531",
+      "audiselected":"",
+      "mercedesselected":"",
+      "saabselected":"selected",
+      "volvoselected":"",
+      "Audi Mercedes Saab Volvo":"Saab",
+      "myfavoritefruit":"banana"
+   },
+   "template":"./defaults/default.html",
+   "template_SettingName":"SOME_template_LOCAL"
+}

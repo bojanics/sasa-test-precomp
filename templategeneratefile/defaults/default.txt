@@ -1,0 +1,53 @@
+Registration information
+------------------------
+
+    Personal details
+    ----------------
+        Id
+        11111111-2222-3333-4444-555555555555
+
+        First Name
+        %first_name%
+        
+        Last Name
+        %last_name%
+
+    	Date of Birth
+        %date_of_birth%
+
+        Email 
+        %email%
+
+        URL 
+        %url%
+
+        Telephone
+        %phone%
+
+		Shoesize
+        %shoe_size%
+
+        Is Adult?
+        %is_adult%
+		
+		Car
+        Audi Mercedes Saab Volvo
+
+        Registration type
+        %registration_type%
+
+        Favorite fruit
+        myfavoritefruit
+        
+
+    Billing address
+    ---------------
+        Address 
+        %address%
+
+        Post code 
+        %post_code%
+
+        Country 
+        %country%
+        

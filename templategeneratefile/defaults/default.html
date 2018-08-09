@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>Test HTML Template</title>
+	<style type="text/css">
+body {
+	margin: 2em 5em;
+	font-family:Georgia, "Times New Roman", Times, serif;
+}
+h1, legend {
+	font-family:Arial, Helvetica, sans-serif;
+}
+label, input, select {
+	display:block; 
+}
+input, select, textarea {
+	margin-bottom: 1em;
+   width: 99%;
+}
+fieldset {
+	margin-bottom: 2em;
+	padding: 1em;
+}
+fieldset fieldset {
+	margin-top: 1em;
+	margin-bottom: 1em;
+}
+input[type="checkbox"], input[type="radio"] {
+   width: 2%;
+}
+.registration-type input, .registration-type label {
+	display:inline-block;
+}
+	</style>
+</head>
+<body>
+<h1>Registration information</h1>
+  <fieldset> 
+    <legend>Personal details</legend> 
+    <div> 
+        <label>Id
+            <input id="id" name="id" type="text" placeholder="Unique Id" value="11111111-2222-3333-4444-555555555555" disabled>
+        </label>
+    </div>
+    <div> 
+        <label>First Name
+            <input id="given-name" name="given-name" type="text" placeholder="First name only" value="%first_name%"> 
+		</label>
+    </div>
+    <div> 
+        <label>Last Name
+            <input id="family-name" name="family-name" type="text" placeholder="Last name only" value="%last_name%"> 
+		</label>
+    </div>
+    <div> 
+    	<label>Date of Birth
+            <input id="dob" name="dob" type="text" value="%date_of_birth%">
+		</label>
+    </div> 
+    <div> 
+        <label>Email 
+            <input id="email" name="email" type="email" placeholder="example@domain.com" value="%email%">
+		</label> 
+    </div> 
+    <div> 
+        <label>URL 
+            <input id="url" name="url" type="url" placeholder="http://mysite.com" value="%url%">
+		</label> 
+    </div>    
+    <div> 
+        <label>Telephone 
+            <input id="phone" name="phone" type="tel" placeholder="Eg. +447000 000000" value="%phone%">
+		</label> 
+    </div> 
+	<div>
+		<label>Shoesize
+            <input id="shoes" name="shoes" type="number" min="5" max="18" value="%shoe_size%">
+		</label>
+	</div>
+	<div>
+		<label>Is Adult?
+            <input id="adult" name="adult" type="checkbox" %is_adult_checked%/>
+		</label>
+	</div>
+    <div>
+		<label>Car
+            <select id="car" name="car" >
+              <option value="audi" audiselected>Audi</option>
+              <option value="mercedes" mercedesselected>Mercedes</option>
+              <option value="saab" saabselected>Saab</option>
+              <option value="volvo" volvoselected>Volvo</option>
+            </select>    
+        </label>
+    </div>
+    <fieldset> 
+      <legend>Registration type</legend> 
+      <div class="registration-type"> 
+          <input id="business" name="registrationtype" type="radio" %is_reg_business_checked%> 
+          <label for="business">Business</label> 
+          <input id="student" name="registrationtype" type="radio" %is_reg_student_checked%>
+          <label for="student">Student</label> 
+          <input id="personal" name="registrationtype" type="radio" %is_reg__checked%> 
+          <label for="personal">Personal</label>
+      </div> 
+    </fieldset>
+    <div>
+        <label>Favorite fruit
+            <img src="https://www.jquery-az.com/html/images/myfavoritefruit.jpg" width="42" height="42"/>
+        </label>
+    </div>
+  </fieldset>
+  <fieldset> 
+    <legend>Billing address</legend> 
+    <div> 
+        <label>Address 
+            <textarea id="address" name="address" rows="5">%address%</textarea>
+		</label> 
+    </div> 
+    <div> 
+        <label>Post code 
+            <input id="postCode" name="postCode" type="text" value="%post_code%">
+		</label> 
+    </div> 
+    <div> 
+        <label>Country 
+            <input id="country" name="country" list="country-names" type="text" value="%country%"> 
+		</label> 
+    </div> 
+  </fieldset> 
+</body>
+</html>
