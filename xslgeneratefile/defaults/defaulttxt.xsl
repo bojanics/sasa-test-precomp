@@ -6,7 +6,7 @@
 </xsl:text>
  <xsl:text>
 </xsl:text>
- <xsl:text>This is XSL_GenerateFile function.</xsl:text>
+ <xsl:text>This is XSL-GenerateFile function.</xsl:text>
  <xsl:text>
 </xsl:text>
  <xsl:text>
@@ -33,6 +33,6 @@
  <xsl:text>Best Regards,</xsl:text>
  <xsl:text>
 </xsl:text>
- <xsl:text>XSL_GenerateFile</xsl:text>
+ <xsl:text>XSL-GenerateFile</xsl:text>
 </xsl:template>
 </xsl:stylesheet>

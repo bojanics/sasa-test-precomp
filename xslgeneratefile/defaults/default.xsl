@@ -4,7 +4,7 @@
  <body>
  <h2>Dear all,</h2>
  <xsl:text></xsl:text>
- <xsl:text>This is XSL_GenerateFile function.</xsl:text>
+ <xsl:text>This is XSL-GenerateFile function.</xsl:text>
  <xsl:text></xsl:text>
  <xsl:text></xsl:text>
  <h4>HERE IS THE DATA:</h4>
@@ -40,7 +40,7 @@
  <xsl:text></xsl:text>
  <h4>Best Regards,</h4>
  <xsl:text></xsl:text>
- <h3>XSL_GenerateFile</h3>
+ <h3>XSL-GenerateFile</h3>
  </body>
  </html>
 </xsl:template>
