@@ -1,0 +1,10 @@
+{  
+   "data":{  
+      "info1":"defv1",
+      "info2":"defv2",
+      "info4":"defv4",
+      "info5":"defv5"
+   },
+   "xsl":"./tests/test.xsl",
+   "xslPre":"./tests/testPre.xsl"
+}
