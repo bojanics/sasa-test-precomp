@@ -582,8 +582,8 @@ namespace AHFormatter_CreatePDF
                 }
             }
 
-            // handle language (modify the result if the language parameter exists)
-            if (lang!=null && ret.value!=null)
+            // handle language (modify the result if the language parameter exists and the value for the parameter is not from config JSON)
+            if (lang!=null && ret.value!=null && ret.source!=3 && ret.source!=4)
             {
                 string val = ret.value;
                 val = val.Replace("\\", "/");
