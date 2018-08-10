@@ -256,7 +256,17 @@ private static void convertJSON2XML(string joname, string nameattr, JContainer j
             {
                 XmlElement propertyElement = doc.CreateElement(string.Empty, "property", string.Empty);
                 propertyElement.SetAttribute("name", name);
-                propertyElement.SetAttribute("value", value.ToString());
+
+                string val = value.ToString();
+                if (value.Type==JTokenType.Boolean || value.Type == JTokenType.Float || value.Type == JTokenType.Date)
+                {
+                    val = JsonConvert.SerializeObject(value);
+                    if(value.Type==JTokenType.Date)
+                    {
+                        val = val.Substring(1, val.Length - 2);
+                    }
+                }
+                propertyElement.SetAttribute("value", val);
                 el.AppendChild(propertyElement);
             }
         }
@@ -276,7 +286,18 @@ private static void convertJSON2XML(string joname, string nameattr, JContainer j
             else if (item is JValue)
             {
                 XmlElement memberElement = doc.CreateElement(string.Empty, "member", string.Empty);
-                memberElement.SetAttribute("value", item.ToString());
+                JValue value = (JValue)item;
+
+                string val = value.ToString();
+                if (value.Type == JTokenType.Boolean || value.Type == JTokenType.Float || value.Type == JTokenType.Date)
+                {
+                val = JsonConvert.SerializeObject(value);
+                if (value.Type == JTokenType.Date)
+                {
+                    val = val.Substring(1, val.Length - 2);
+                }
+                }
+                memberElement.SetAttribute("value", val);
                 el.AppendChild(memberElement);
             }
         }
