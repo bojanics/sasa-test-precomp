@@ -156,32 +156,26 @@ namespace AHFormatter_CreatePDF
                 {
                     ParamInfo lang_transf = handleParameter(json, config_json, "lang", true, null, null, null, log);
                     lang = lang_transf.value;
-                    // if Configuration JSON came from DEFAULT settings, check if there was a lang in default settings and use that value if not null
-                    if (Configuration_transf.source==5)
+                    // if lang JSON is not null, and it didn't come from JSON configuration (it came from default settings), handle Configuration again
+                    if (lang!=null && lang_transf.source==5)
                     {
-                        string vv = System.Environment.GetEnvironmentVariable("PDFGEN_DEFAULT_lang");
-                        if (vv != null)
+                        // now handle Configuration again with the language parameter
+                        firstErrorMsg = null;
+                        Configuration_transf = handleParameter(json, null, "Configuration", true, rootloc, null, lang, log);
+                        if (Configuration_transf.value != null)
                         {
-                            lang = vv;
-                            // now handle Configuration again with the language parameter
-                            firstErrorMsg = null;
-                            Configuration_transf = handleParameter(json, null, "Configuration", true, rootloc, null, lang, log);
-                            if (Configuration_transf.value != null)
+                            using (WebClient wclient = new WebClient())
                             {
-                                using (WebClient wclient = new WebClient())
+                                try
                                 {
-                                    try
-                                    {
-                                        string config_str = wclient.DownloadString(Configuration_transf.value);
-                                        config_json = JsonConvert.DeserializeObject(config_str);
-                                    }
-                                    catch (Exception ex)
-                                    {
-                                        firstErrorMsg = "PDF will not be generated because the following error occurred when trying to download configuration file: " + ex.Message;
-                                    }
+                                    string config_str = wclient.DownloadString(Configuration_transf.value);
+                                    config_json = JsonConvert.DeserializeObject(config_str);
+                                }
+                                catch (Exception ex)
+                                {
+                                    firstErrorMsg = "PDF will not be generated because the following error occurred when trying to download configuration file: " + ex.Message;
                                 }
                             }
-
                         }
                     }
                 }                

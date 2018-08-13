@@ -1,3 +1,4 @@
+const PARAM_NAME_LANG = 'lang';
 const PARAM_NAME_CONFIGURATION = 'Configuration';
 const PARAM_NAME_CALCULATION = 'calculation';
 const PARAM_NAME_DATA = 'data';
@@ -8,18 +9,44 @@ const DEFAULT_calculation_CODE = "./defaults/default.js";
 
 module.exports = function (context, req) {
     context.log('Starting calculation...');
-    //context.log("REQBODY="+JSON.stringify(req.body));
+    context.log("REQBODY="+JSON.stringify(req.body));
+    context.log("REQHDRS="+JSON.stringify(req.headers));
 
     var calcinfo = {};
 
     try {
         var rootloc = context.executionContext.functionDirectory;
-        var config_param = handleParameter(req.body,null,PARAM_NAME_CONFIGURATION,rootloc,null,context);
-        AddResponseParam(calcinfo, config_param);
+
+        var lang = null;
+        try
+        {
+            lang = req.body.lang;
+        }
+        catch (ex) {}
+        if (lang == null)
+        {
+            var lang_SettingName = null;
+            try
+            {
+                lang_SettingName = req.body.lang_SettingName;
+            }
+            catch (ex){}
+            if (lang_SettingName != null)
+            {
+                var vv = process.env[lang_SettingName];
+                if (vv != null)
+                {
+                    lang = vv;
+                }
+            }
+
+        }
+
+        var config_param = handleParameter(req.body,null,PARAM_NAME_CONFIGURATION,rootloc,null,lang,context);
         if (config_param.value!=null) {
-            requireLocalOrRemote(config_param.value,config_param.isRemoteURL,context,function(err,config_json){onConfigRequired(context,req,calcinfo,err,config_json);});
+            requireLocalOrRemote(config_param.value,config_param.isRemoteURL,context,function(err,config_json){onConfigRequired(context,req,calcinfo,err,config_json,config_param,lang);});
         } else {
-           onConfigRequired(context,req,calcinfo,null,null);
+           onConfigRequired(context,req,calcinfo,null,null,config_param,lang);
         }
     } catch (e) {
         var statusCode = 500;
@@ -29,9 +56,27 @@ module.exports = function (context, req) {
 }
 
 // This function is executed if configuration parameter is specified, and after it is loaded or failed to load
-function onConfigRequired(context,req,calcinfo,err,config_json) {
+function onConfigRequired(context,req,calcinfo,err,config_json,config_param,lang) {
+    if (lang==null) {
+        var lang_param = handleParameter(req.body,config_json,PARAM_NAME_LANG,null,null,null,context);
+        lang = lang_param.value;
+        // if lang JSON is not null, and it didn't come from JSON configuration (it came from default settings), handle Configuration again
+        if (lang!=null && lang_param.source==5) {
+            // now handle Configuration again with the language parameter
+            config_param = handleParameter(req.body,null,PARAM_NAME_CONFIGURATION,rootloc,null,lang,context);
+            if (config_param.value!=null) {
+                requireLocalOrRemote(config_param.value,config_param.isRemoteURL,context,function(err,config_json){onConfigRequired(context,req,calcinfo,err,config_json,config_param,lang);});
+            } else {
+                onConfigRequired(context,req,calcinfo,null,null,config_param,lang);
+            }
+            return;
+        }              
+   }
+   calcinfo[PARAM_NAME_LANG]=lang;
+   AddResponseParam(calcinfo, config_param);
+
    var rootloc = context.executionContext.functionDirectory;   
-   var calc_param = handleParameter(req.body,config_json,PARAM_NAME_CALCULATION,rootloc,DEFAULT_calculation_CODE,context)
+   var calc_param = handleParameter(req.body,config_json,PARAM_NAME_CALCULATION,rootloc,DEFAULT_calculation_CODE,null,context)
    AddResponseParam(calcinfo, calc_param);
 
    var data = handleData(context,req,config_json,calcinfo);
@@ -65,6 +110,11 @@ function handleCalc(context,req,calcinfo,data,calc) {
    try {
       var crstr = calc.calculate(data);
       calcres = JSON.parse(crstr);
+      for (var p in calcres) {
+         if (p.toLowerCase().startsWith("xlew_")) {
+            delete jsond[p];
+         }
+      }    
       statusCode = 200;
       statusMessage = 'Calculation successfully executed.';
    } catch (e) {
@@ -82,7 +132,7 @@ function handleResponse(context,req,calcres,calcinfo,statusCode,statusMessage) {
     };
     
     context.log(statusMessage);
-    //context.log('calcres='+crstr)
+    context.log('calcres='+JSON.stringify(calcres));
     context.done();
 }
 
@@ -136,18 +186,20 @@ function AddResponseParam(calcinfo,paraminfo)
 
 // returns object representing parameter for calculation (either Configuration or calculation)
 // it considers "normal" request parameter, and "setting" request parameter, as well as the same parameter given in JSON configuration
-// if non of them is found, it tries to use DEFAULT application setting...it 
-function handleParameter(json,config_json,name,rootloc,defaultVal,context) {
+// if non of them is found, it tries to use DEFAULT application setting. "lang" parameter is also considered if provided.
+function handleParameter(json,config_json,name,rootloc,defaultVal,lang,context) {
     //context.log('handling param '+name);
     var ret = {};
     ret.name = name;
     ret.isRemoteURL = false;
+    ret.source = 0;
     var paramResolved = false;
     if (json!=null) {
         var v = json[name];
         if (v!=null) {
             ret.value = v;
             ret.orig_value = v;
+            ret.source = 1;
             paramResolved = true;
         }
         if (!paramResolved) {
@@ -160,6 +212,7 @@ function handleParameter(json,config_json,name,rootloc,defaultVal,context) {
                 {
                     ret.value = vv;
                     ret.orig_value = vv;
+                    ret.source = 2;
                     paramResolved = true;
                 }
             }
@@ -170,6 +223,7 @@ function handleParameter(json,config_json,name,rootloc,defaultVal,context) {
         if (v!=null) {
             ret.value = v;
             ret.orig_value = v;
+            ret.source = 3;
             paramResolved = true;
         }
         if (!paramResolved) {
@@ -182,6 +236,7 @@ function handleParameter(json,config_json,name,rootloc,defaultVal,context) {
                 {
                     ret.value = vv;
                     ret.orig_value = vv;
+                    ret.source = 4;
                     paramResolved = true;
                 }
             }
@@ -196,6 +251,7 @@ function handleParameter(json,config_json,name,rootloc,defaultVal,context) {
         {
             ret.value = v;
             ret.orig_value = v;
+            ret.source = 5;
             paramResolved = true;            
         }
     }
@@ -207,8 +263,28 @@ function handleParameter(json,config_json,name,rootloc,defaultVal,context) {
         {
             ret.value = defaultVal;
             ret.orig_value = defaultVal;
+            ret.source = 6;
             paramResolved = true;
         }
+    }
+
+    // handle language (modify the result if the language parameter exists and the value for the parameter is not from config JSON)
+    if (lang!=null && ret.value!=null && ret.source!=3 && ret.source!=4) {
+        var val = ret.value;
+        val = val.replace(/\\/g, "/")
+        var index_dot = val.lastIndexOf(".");
+        var index_slash = val.lastIndexOf("/");
+
+        if (index_dot > 0 && index_dot > index_slash) {
+            // if there is a dot and it is after slash or backslash
+            var prefix = ret.value.substring(0, index_dot);
+            var suffix = ret.value.substring(index_dot);
+            ret.value = prefix+"_"+lang+suffix;
+        } else {
+            // if there is no dot
+            ret.value = ret.value + "_"+lang;
+        }
+        ret.orig_value = ret.value;
     }
 
     if (ret.value != null)
