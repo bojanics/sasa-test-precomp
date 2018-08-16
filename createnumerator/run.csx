@@ -4,7 +4,6 @@
 
 #load "NumeratorCommon.csx"
 
-using System.Linq;
 using System.Net;
 using System.Net.Http;
 using System.Threading.Tasks;
@@ -19,21 +18,19 @@ using Microsoft.Azure.Documents.Client;
 
 public static async Task<HttpResponseMessage> Run(HttpRequestMessage req, TraceWriter log, ExecutionContext context)
 {
-    log.Info("Starting to retrieve the next 'number'...");
+    log.Info("Starting creation of numerator...");
     string rootloc = context.FunctionDirectory;
     bool isLocal = string.IsNullOrEmpty(Environment.GetEnvironmentVariable("WEBSITE_INSTANCE_ID"));
-    string fncname = rootloc.Substring(rootloc.Replace("\\", "/").LastIndexOf("/") + 1);
     if (isLocal)
     {
         rootloc = Directory.GetParent(rootloc).FullName;
-        fncname = "GetNext";
     }
-    
+    log.Info("Exec func: " + Environment.GetEnvironmentVariable("WEBSITE_SITE_NAME") + ", RL=" + rootloc);
 
     JObject response_body = new JObject();
 
     //JObject numerator_info = new JObject { };
-    string getNext_info = null;
+    Document numerator_info = new Document();
     HttpStatusCode statusCode = HttpStatusCode.OK;
     String statusMessage = null;
     // Initialize response info object
@@ -102,7 +99,7 @@ public static async Task<HttpResponseMessage> Run(HttpRequestMessage req, TraceW
                 }
                 catch (Exception ex)
                 {
-                    firstErrorMsg = "getNext will not be executed because the following error occurred when trying to download configuration file: " + ex.Message;
+                    firstErrorMsg = "Numerator will not be generated because the following error occurred when trying to download configuration file: " + ex.Message;
                 }
             }
         }
@@ -128,7 +125,7 @@ public static async Task<HttpResponseMessage> Run(HttpRequestMessage req, TraceW
                         }
                         catch (Exception ex)
                         {
-                            firstErrorMsg = "getNext will not be executed because the following error occurred when trying to download configuration file: " + ex.Message;
+                            firstErrorMsg = "Numerator will not be generated because the following error occurred when trying to download configuration file: " + ex.Message;
                         }
                     }
                 }
@@ -158,8 +155,6 @@ public static async Task<HttpResponseMessage> Run(HttpRequestMessage req, TraceW
 
         ParamInfo numeratorInfo_transf = CommonNumeratorUtilities.handleParameter(json, config_json, "numeratorInfo", true, null, null, null, log);
         CommonNumeratorUtilities.AddResponseParam(createNumeratorInfo, numeratorInfo_transf, false, false, false);
-        
-        
         /*
         JToken numeratorInfo_req = null;
         if (json != null && json.numeratorInfo != null)
@@ -173,8 +168,8 @@ public static async Task<HttpResponseMessage> Run(HttpRequestMessage req, TraceW
         {
             throw new Exception(firstErrorMsg);
         }
-
-        getNext_info = await getNext(CosmosDBEndpoint_transf.value, CosmosDBAuthorizationKey_transf.value, CosmosDBDatabaseId_transf.value, CosmosDBCollectionId_transf.value, numeratorId_transf.value, numeratorName_transf.value, numeratorInfo_transf.value, fncname, log);
+        
+        numerator_info = await createNumerator(CosmosDBEndpoint_transf.value, CosmosDBAuthorizationKey_transf.value,CosmosDBDatabaseId_transf.value,CosmosDBCollectionId_transf.value, numeratorId_transf.value,numeratorName_transf.value,numeratorInfo_transf.value,log);
 
         statusCode = HttpStatusCode.OK;
         statusMessage = "Numerator successfully created.";
@@ -188,37 +183,34 @@ public static async Task<HttpResponseMessage> Run(HttpRequestMessage req, TraceW
     //log.Info("fileInfo="+fileInfo.ToString());
     JObject ni = new JObject();
     //ni.Add(numerator_info.ToString());
-    response_body.Add("getNext", getNext_info);
-    response_body.Add("getNextInfo", createNumeratorInfo);
+    response_body.Add("numerator", JObject.Parse(numerator_info.ToString()));
+    response_body.Add("createNumeratorInfo", createNumeratorInfo);
     response_body.Add("statusCode", (int)statusCode);
     response_body.Add("statusMessage", statusMessage);
 
     return req.CreateResponse(statusCode, response_body);
 }
 
-private async static Task<string> getNext(string endpoint, string authorizationKey, string databaseId, string collectionId, string id, string name, dynamic info, string fncname, TraceWriter log)
+private async static Task<Document> createNumerator(string endpoint, string authorizationKey, string databaseId, string collectionId, string id, string name, dynamic info,TraceWriter log)
 {
     DocumentClient _client = null;
     try
     {
         _client = new DocumentClient(new Uri(endpoint), authorizationKey);
-        var dbSetup = new DatabaseSetup(_client, log);
+        var dbSetup = new DatabaseSetup(_client,log);
         await dbSetup.Init(databaseId, collectionId);
 
-        string ret = await dbSetup.GetNext(id, name, info, fncname);
-        return ret;
-    }
-    catch (Exception ex)
+        var document = await dbSetup.CreateNumerator(id, name, info);
+
+        return document;
+    } catch (Exception ex)
     {
         throw ex;
-    }
-    finally
+    } finally
     {
-        if (_client != null)
+        if (_client!=null)
         {
             _client.Dispose();
         }
     }
 }
-
-
