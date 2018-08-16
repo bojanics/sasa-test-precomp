@@ -376,6 +376,8 @@ public class DatabaseSetup
 
     public async Task<Document> AddPool(string numeratorid, string numeratorname, dynamic numeratorupdateinfo, string prefix, int? from, int? to, int? digits, string suffix, string who, string when, string comment, dynamic actions, dynamic info)
     {
+        bool beforeConcurrentReq = false;
+        bool afterConcurrentReq = false;
         try
         {
             dynamic doc = await GetNumerator(numeratorid, numeratorname, numeratorupdateinfo);
@@ -399,26 +401,35 @@ public class DatabaseSetup
             doc.updated = numeratorupdateinfo;
 
             var ac = new AccessCondition { Condition = doc.ETag, Type = AccessConditionType.IfMatch };
-            await Client.ReplaceDocumentAsync(doc._self, doc, new RequestOptions { AccessCondition = ac });
+            beforeConcurrentReq = true;
+            doc = await Client.ReplaceDocumentAsync(doc._self, doc, new RequestOptions { AccessCondition = ac });
+            afterConcurrentReq = true;
 
             return doc;
         }
         catch (Exception ex)
         {
-            throw new Exception("Failed to create pool for numerator[Id=" + numeratorid + ", name=" + numeratorname + ", label=numerator, type=pool]", ex);
+            string addMsg = "";
+            if (beforeConcurrentReq && !afterConcurrentReq)
+            {
+                addMsg = ". Problem with the concurrent requests!";
+            }
+            throw new Exception("Failed to create pool for numerator[Id=" + numeratorid + ", name=" + numeratorname + ", label=numerator, type=pool]"+addMsg, ex);
         }
     }
 
     public async Task<string> GetNext(string numeratorid, string numeratorname, dynamic numeratorupdateinfo, string fncname)
     {
         long t3 = DateTimeOffset.Now.ToUnixTimeMilliseconds();
+        bool beforeConcurrentReq = false;
+        bool afterConcurrentReq = false;
         try
         {
             long t1 = DateTimeOffset.Now.ToUnixTimeMilliseconds();
             log.Info("Getting numerator doc for thread " + System.Threading.Thread.CurrentThread.Name);
             dynamic doc = await GetNumerator(numeratorid, numeratorname, numeratorupdateinfo);
             long t2 = DateTimeOffset.Now.ToUnixTimeMilliseconds();
-            log.Info((t2-t1)+": Numerator retrieved for thread " + System.Threading.Thread.CurrentThread.Name);
+//            log.Info((t2-t1)+": Numerator retrieved for thread " + System.Threading.Thread.CurrentThread.Name);
             int cnt = 0;
             try
             {
@@ -518,10 +529,12 @@ public class DatabaseSetup
 
             var ac = new AccessCondition { Condition = doc.ETag, Type = AccessConditionType.IfMatch };
             t3 = DateTimeOffset.Now.ToUnixTimeMilliseconds();
-            log.Info((t3 - t2) + ": GetNext logic for thread " + System.Threading.Thread.CurrentThread.Name);
+//            log.Info((t3 - t2) + ": GetNext logic for thread " + System.Threading.Thread.CurrentThread.Name);
+            beforeConcurrentReq = true;
             await Client.ReplaceDocumentAsync(doc._self, doc, new RequestOptions { AccessCondition = ac }); // update CosmosDB
+            afterConcurrentReq = true;
             long t4 = DateTimeOffset.Now.ToUnixTimeMilliseconds();
-            log.Info((t4 - t3) + ": replace docu logic for thread " + System.Threading.Thread.CurrentThread.Name);
+//            log.Info((t4 - t3) + ": replace docu logic for thread " + System.Threading.Thread.CurrentThread.Name);
 
 
             string nextnum = nn.ToString();
@@ -543,9 +556,14 @@ public class DatabaseSetup
         }
         catch (Exception ex)
         {
+            string addMsg = "";
+            if (beforeConcurrentReq && !afterConcurrentReq)
+            {
+                addMsg = ". Problem with the concurrent requests!";
+            }
             long t4 = DateTimeOffset.Now.ToUnixTimeMilliseconds();
-            log.Info((t4 - t3) + ": exception when doing replace docu logic for thread " + System.Threading.Thread.CurrentThread.Name);
-            throw new Exception("Failed to get number for numerator[Id=" + numeratorid + ", name=" + numeratorname + ", label=numerator, type=pool]", ex);
+            //log.Info((t4 - t3) + ": exception when replace docu logic for thread " + System.Threading.Thread.CurrentThread.Name);
+            throw new Exception("Failed to get number for numerator[Id=" + numeratorid + ", name=" + numeratorname + ", label=numerator, type=pool]"+addMsg, ex);
         }
     }
 }
