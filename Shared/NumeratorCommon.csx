@@ -15,7 +15,6 @@ using Newtonsoft.Json.Linq;
 
 public class CommonNumeratorUtilities
 {
-
     // Some constants for code defaults
     public const string DEFAULT_CosmosDBEndpoint_CODE = "https://sasa-test.documents.azure.com:443";
     public const string DEFAULT_CosmosDBAuthorizationKey_CODE = "XRysJNSllsVfZV5LAdh8YIrzOIGigtL6J5Y02syXquUh1SE7bFP9vdkJLFBsrGqRyd4wYsQgoP6SN5yxgDcjOQ==";
@@ -267,20 +266,20 @@ public class CommonNumeratorUtilities
         return ret;
     }
 
-    }
+}
 
 
-    public class ParamInfo
-    {
+public class ParamInfo
+{
     public string name { get; set; }
     public string value { get; set; }
     public string orig_value { get; set; }
     public bool isSetting { get; set; }
     public int source { get; set; }
-    }
+}
 
-    public class DatabaseSetup
-    {
+public class DatabaseSetup
+{
     public DocumentClient Client { get; }
     public DocumentCollection Collection { get; private set; }
 
@@ -549,4 +548,6 @@ public class CommonNumeratorUtilities
             throw new Exception("Failed to get number for numerator[Id=" + numeratorid + ", name=" + numeratorname + ", label=numerator, type=pool]", ex);
         }
     }
+
+
 }
