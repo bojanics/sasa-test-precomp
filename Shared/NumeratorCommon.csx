@@ -13,7 +13,7 @@ using System.Configuration;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 
-public class CommonNumeratorUtilities
+public static class CommonNumeratorUtilities
 {
     // Some constants for code defaults
     public const string DEFAULT_CosmosDBEndpoint_CODE = "https://sasa-test.documents.azure.com:443";
@@ -548,6 +548,4 @@ public class DatabaseSetup
             throw new Exception("Failed to get number for numerator[Id=" + numeratorid + ", name=" + numeratorname + ", label=numerator, type=pool]", ex);
         }
     }
-
-
 }
