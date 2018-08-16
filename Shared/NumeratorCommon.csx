@@ -544,7 +544,7 @@ public class DatabaseSetup
         catch (Exception ex)
         {
             long t4 = DateTimeOffset.Now.ToUnixTimeMilliseconds();
-            log.Info((t4 - t3) + ": exception when replace docu logic for thread " + System.Threading.Thread.CurrentThread.Name);
+            log.Info((t4 - t3) + ": exception when doing replace docu logic for thread " + System.Threading.Thread.CurrentThread.Name);
             throw new Exception("Failed to get number for numerator[Id=" + numeratorid + ", name=" + numeratorname + ", label=numerator, type=pool]", ex);
         }
     }
