@@ -2,7 +2,7 @@
 #r "System.Configuration"
 #r "Microsoft.Azure.Documents.Client.dll"
 
-#load "../Shared/NumeratorCommon.csx"
+#load "NumeratorCommon.csx"
 
 using System.Linq;
 using System.Net;
