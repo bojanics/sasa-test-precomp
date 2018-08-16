@@ -1,5 +1,6 @@
 #r "Newtonsoft.Json"
 #r "System.Configuration"
+#r "Microsoft.Azure.Documents.Client.dll"
 
 #load "../Shared/NumeratorCommon.csx"
 
