@@ -20,7 +20,7 @@ public static class CommonNumeratorUtilities
     public const string DEFAULT_CosmosDBAuthorizationKey_CODE = "XRysJNSllsVfZV5LAdh8YIrzOIGigtL6J5Y02syXquUh1SE7bFP9vdkJLFBsrGqRyd4wYsQgoP6SN5yxgDcjOQ==";
     public const string DEFAULT_CosmosDBDatabaseId_CODE = "test-numerator";
     public const string DEFAULT_CosmosDBCollectionId_CODE = "numberpools";
-
+    public const string NUMERATOR_PREFIX = "NUMERATOR_";
     public static string getInnerExceptionMessage(Exception ex, string oldMessage)
     {
         if (ex.InnerException != null)
@@ -31,34 +31,34 @@ public static class CommonNumeratorUtilities
         return ex.Message != null ? ex.Message + (oldMessage != null ? ";" + oldMessage : "") : (oldMessage != null ? oldMessage : "");
     }
 
-    public static void AddResponseParam(JObject fileinfo, ParamInfo param, bool isPassword, bool isBoolean, bool isInteger)
+    public static void AddResponseParam(JObject funcParaminfo, ParamInfo param, bool isPassword, bool isBoolean, bool isInteger)
     {
         // Add "normal" parameter from the request
         string val = (isPassword && param.orig_value != null ? "*****" : param.orig_value);
         if (isBoolean)
         {
-            fileinfo.Add(param.name, Boolean.Parse(val));
+            funcParaminfo.Add(param.name, Boolean.Parse(val));
         } else if (isInteger)
         {
             if (param.orig_value == null)
             {
-                fileinfo.Add(param.name, null);
+                funcParaminfo.Add(param.name, null);
             }
             else
             {
                 try
                 {
-                    fileinfo.Add(param.name, Int32.Parse(param.orig_value));
+                    funcParaminfo.Add(param.name, Int32.Parse(param.orig_value));
                 }
                 catch (Exception ex)
                 {
-                    throw new Exception("Value for parameter " + param.name + " is not a valid integer!", ex);
+                   funcParaminfo.Add(param.name, param.orig_value);
                 }
             }
         }
         else
         {
-            fileinfo.Add(param.name, val);
+            funcParaminfo.Add(param.name, val);
         }
     }
 
@@ -181,7 +181,7 @@ public static class CommonNumeratorUtilities
         // handle DEFAULT setting
         if (!paramResolved)
         {
-            string config_DEFAULT_SettingOrConnectionStringName = "NUMERATOR_DEFAULT_" + name;
+            string config_DEFAULT_SettingOrConnectionStringName = NUMERATOR_PREFIX+"DEFAULT_" + name;
             string v = null;
             if (isSetting)
             {
@@ -359,12 +359,16 @@ public class DatabaseSetup
         dynamic doc = null;
         if (numeratorid != null && !numeratorid.Trim().Equals(""))
         {
-            ResourceResponse<Document> response = await Client.ReadDocumentAsync(UriFactory.CreateDocumentUri(databaseId, collectionId, numeratorid));
-            doc = response.Resource;
+            try
+            {
+                ResourceResponse<Document> response = await Client.ReadDocumentAsync(UriFactory.CreateDocumentUri(databaseId, collectionId, numeratorid));
+                doc = response.Resource;
+            } catch(Exception ex)
+            {
+            }
         }
         else
         {
-            log.Info("Query: SELECT * from c WHERE c.name='" + numeratorname + "' AND c.label='numerator' AND c.type='pool'");
             doc = Client.CreateDocumentQuery<dynamic>(Collection.SelfLink, "SELECT * from c WHERE c.name='" + numeratorname + "' AND c.label='numerator' AND c.type='pool'").AsEnumerable().FirstOrDefault();
         }
         if (doc == null)
@@ -374,19 +378,29 @@ public class DatabaseSetup
         return doc;
     }
 
-    public async Task<Document> AddPool(string numeratorid, string numeratorname, dynamic numeratorupdateinfo, string prefix, int? from, int? to, int? digits, string suffix, string who, string when, string comment, dynamic actions, dynamic info)
+    public async Task<Document> AddPool(string numeratorid, string numeratorname, string prefix, int? from, int? to, int? digits, string suffix, string who, string when, string comment, dynamic actions, dynamic info, int maxattempts)
     {
         bool beforeConcurrentReq = false;
         bool afterConcurrentReq = false;
+        if (maxattempts<1)
+        {
+            maxattempts = 1;
+        }
+        dynamic doc = null;
+        for (int cntattempts = 0; cntattempts < maxattempts; cntattempts++)
+        {
+            beforeConcurrentReq = false;
+            afterConcurrentReq = false;
         try
         {
-            dynamic doc = await GetNumerator(numeratorid, numeratorname, numeratorupdateinfo);
+            doc = await GetNumerator(numeratorid, numeratorname, info);
             int cnt = 0;
             try
             {
                 cnt = doc.pools.Count;
             }
-            catch (Exception ex) {
+            catch (Exception ex)
+            {
             }
             dynamic eop = new ExpandoObject();
             eop.pools = new dynamic[cnt + 1];
@@ -398,36 +412,49 @@ public class DatabaseSetup
             eop.pools[cnt] = new { prefix = prefix, from = from, to = to, next = from, digits=digits,suffix=suffix,who=who,when=when,comment=comment,actions=actions,created=info,updated = nullvalue};
             doc.pools = eop.pools;
 
-            doc.updated = numeratorupdateinfo;
+            doc.updated = info;
 
             var ac = new AccessCondition { Condition = doc.ETag, Type = AccessConditionType.IfMatch };
             beforeConcurrentReq = true;
             doc = await Client.ReplaceDocumentAsync(doc._self, doc, new RequestOptions { AccessCondition = ac });
             afterConcurrentReq = true;
-
-            return doc;
         }
         catch (Exception ex)
-        {
-            string addMsg = "";
-            if (beforeConcurrentReq && !afterConcurrentReq)
             {
-                addMsg = ". Problem with the concurrent requests!";
+                log.Info("Failed attempt number " + (cntattempts + 1));
+                if (cntattempts==maxattempts-1 || !beforeConcurrentReq)
+                {
+                    string addMsg = "";
+                    if (beforeConcurrentReq && !afterConcurrentReq)
+                    {
+                        addMsg = ". Problem with the concurrent requests!";
+                    }
+                    throw new Exception("Failed to create pool for numerator[Id=" + numeratorid + ", name=" + numeratorname + ", label=numerator, type=pool]" + addMsg, ex);
+                }
             }
-            throw new Exception("Failed to create pool for numerator[Id=" + numeratorid + ", name=" + numeratorname + ", label=numerator, type=pool]"+addMsg, ex);
         }
+        return doc;
     }
 
-    public async Task<string> GetNext(string numeratorid, string numeratorname, dynamic numeratorupdateinfo, string fncname)
+    public async Task<NumeratorInfo> GetNext(string numeratorid, string numeratorname, dynamic numeratorupdateinfo, string fncname, int maxattempts)
     {
         long t3 = DateTimeOffset.Now.ToUnixTimeMilliseconds();
         bool beforeConcurrentReq = false;
         bool afterConcurrentReq = false;
+        if (maxattempts < 1)
+        {
+            maxattempts = 1;
+        }
+        dynamic doc = null;
+        for (int cntattempts = 0; cntattempts < maxattempts; cntattempts++)
+        {
+            beforeConcurrentReq = false;
+            afterConcurrentReq = false;
         try
         {
             long t1 = DateTimeOffset.Now.ToUnixTimeMilliseconds();
-            log.Info("Getting numerator doc for thread " + System.Threading.Thread.CurrentThread.Name);
-            dynamic doc = await GetNumerator(numeratorid, numeratorname, numeratorupdateinfo);
+//          log.Info("Getting numerator doc for thread " + System.Threading.Thread.CurrentThread.Name);
+            doc = await GetNumerator(numeratorid, numeratorname, numeratorupdateinfo);
             long t2 = DateTimeOffset.Now.ToUnixTimeMilliseconds();
 //            log.Info((t2-t1)+": Numerator retrieved for thread " + System.Threading.Thread.CurrentThread.Name);
             int cnt = 0;
@@ -440,7 +467,7 @@ public class DatabaseSetup
             }
             if (cnt == 0)
             {
-                doc = await AddPool(numeratorid, numeratorname, numeratorupdateinfo, null, 1, null, null, null, null, null, "Numerator document was not found and was created by function '"+fncname+"'", null, null);
+                doc = await AddPool(numeratorid, numeratorname, null, 1, null, null, null, "Function '"+fncname+"'", DateTimeOffset.Now.ToUniversalTime().ToString("yyyy'-'MM'-'dd'T'HH':'mm':'ss'.'fff'Z'"), "Numerator document was not found and was created by function '" + fncname + "'", null, numeratorupdateinfo, maxattempts);
                 cnt = 1;
             }
             doc.updated = numeratorupdateinfo;
@@ -463,7 +490,8 @@ public class DatabaseSetup
                         useduppools.Add(pi);
                     }
                     break;
-                } else
+                }
+                else
                 {
                     useduppools.Add(pi);
                 }
@@ -505,7 +533,8 @@ public class DatabaseSetup
                     {
                         eop.pools[j] = mypool;
                         j++;
-                    } else
+                    } 
+					else
                     {
                         eoh.history[k] = mypool;
                         k++;
@@ -515,7 +544,8 @@ public class DatabaseSetup
                 {
                     eop.pools[j] = doc.pools[i];
                     j++;
-                } else
+                } 
+				else
                 {
                     eoh.history[k] = doc.pools[i];
                     k++;
@@ -531,7 +561,7 @@ public class DatabaseSetup
             t3 = DateTimeOffset.Now.ToUnixTimeMilliseconds();
 //            log.Info((t3 - t2) + ": GetNext logic for thread " + System.Threading.Thread.CurrentThread.Name);
             beforeConcurrentReq = true;
-            await Client.ReplaceDocumentAsync(doc._self, doc, new RequestOptions { AccessCondition = ac }); // update CosmosDB
+            doc = await Client.ReplaceDocumentAsync(doc._self, doc, new RequestOptions { AccessCondition = ac }); // update CosmosDB
             afterConcurrentReq = true;
             long t4 = DateTimeOffset.Now.ToUnixTimeMilliseconds();
 //            log.Info((t4 - t3) + ": replace docu logic for thread " + System.Threading.Thread.CurrentThread.Name);
@@ -552,18 +582,36 @@ public class DatabaseSetup
                 nextnum += mypool.suffix; // add suffix
             }
 
-            return nextnum;
-        }
-        catch (Exception ex)
-        {
-            string addMsg = "";
-            if (beforeConcurrentReq && !afterConcurrentReq)
-            {
-                addMsg = ". Problem with the concurrent requests!";
+                NumeratorInfo ni = new NumeratorInfo();
+                ni.value = nextnum;
+                ni.pool = mypool;
+                ni.doc = doc;
+                log.Info("-------------NUM=" + nextnum + "------------");
+                return ni;
             }
-            long t4 = DateTimeOffset.Now.ToUnixTimeMilliseconds();
-            //log.Info((t4 - t3) + ": exception when replace docu logic for thread " + System.Threading.Thread.CurrentThread.Name);
-            throw new Exception("Failed to get number for numerator[Id=" + numeratorid + ", name=" + numeratorname + ", label=numerator, type=pool]"+addMsg, ex);
+            catch (Exception ex)
+            {
+                log.Info("Failed attempt number " + (cntattempts + 1));
+                if (cntattempts == maxattempts - 1 || !beforeConcurrentReq)
+                {
+                    string addMsg = "";
+                    if (beforeConcurrentReq && !afterConcurrentReq)
+                    {
+                        addMsg = ". Problem with the concurrent requests!";
+                    }
+                    throw new Exception("Failed to get number for numerator[Id=" + numeratorid + ", name=" + numeratorname + ", label=numerator, type=pool]" + addMsg, ex);
+                }
+                long t4 = DateTimeOffset.Now.ToUnixTimeMilliseconds();
+                //log.Info((t4 - t3) + ": exception when replace docu logic for thread " + System.Threading.Thread.CurrentThread.Name);
+            }
         }
+        return doc;
     }
+}
+
+public class NumeratorInfo
+{
+    public string value { get; set; }
+    public dynamic pool { get; set; }
+    public dynamic doc { get; set; }
 }

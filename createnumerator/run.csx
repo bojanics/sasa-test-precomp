@@ -25,12 +25,10 @@ public static async Task<HttpResponseMessage> Run(HttpRequestMessage req, TraceW
     {
         rootloc = Directory.GetParent(rootloc).FullName;
     }
-    log.Info("Exec func: " + Environment.GetEnvironmentVariable("WEBSITE_SITE_NAME") + ", RL=" + rootloc);
 
     JObject response_body = new JObject();
 
-    //JObject numerator_info = new JObject { };
-    Document numerator_info = new Document();
+    Document numerator_info = null;
     HttpStatusCode statusCode = HttpStatusCode.OK;
     String statusMessage = null;
     // Initialize response info object
@@ -147,29 +145,55 @@ public static async Task<HttpResponseMessage> Run(HttpRequestMessage req, TraceW
         ParamInfo CosmosDBCollectionId_transf = CommonNumeratorUtilities.handleParameter(json, config_json, "CosmosDBCollectionId", true, null, CommonNumeratorUtilities.DEFAULT_CosmosDBCollectionId_CODE, null, log);
         CommonNumeratorUtilities.AddResponseParam(createNumeratorInfo, CosmosDBCollectionId_transf, false, false, false);
 
-        ParamInfo numeratorId_transf = CommonNumeratorUtilities.handleParameter(json, config_json, "numeratorId", true, null, null, null, log);
-        CommonNumeratorUtilities.AddResponseParam(createNumeratorInfo, numeratorId_transf, false, false, false);
+        string numeratorId = null;
+        if (json != null && json.numeratorId != null)
+        {
+            numeratorId = json.numeratorId;
+        }
+        createNumeratorInfo.Add("numeratorId", numeratorId);
 
-        ParamInfo numeratorName_transf = CommonNumeratorUtilities.handleParameter(json, config_json, "numeratorName", true, null, null, null, log);
-        CommonNumeratorUtilities.AddResponseParam(createNumeratorInfo, numeratorName_transf, false, false, false);
+        string numeratorName = null;
+        if (json != null && json.numeratorName != null)
+        {
+            numeratorName = json.numeratorName;
+        }
+        createNumeratorInfo.Add("numeratorName", numeratorName);
 
-        ParamInfo numeratorInfo_transf = CommonNumeratorUtilities.handleParameter(json, config_json, "numeratorInfo", true, null, null, null, log);
-        CommonNumeratorUtilities.AddResponseParam(createNumeratorInfo, numeratorInfo_transf, false, false, false);
-        /*
         JToken numeratorInfo_req = null;
         if (json != null && json.numeratorInfo != null)
         {
             numeratorInfo_req = json.numeratorInfo;
         }
         createNumeratorInfo.Add("numeratorInfo", numeratorInfo_req);
-        */
 
         if (firstErrorMsg != null)
         {
             throw new Exception(firstErrorMsg);
         }
-        
-        numerator_info = await createNumerator(CosmosDBEndpoint_transf.value, CosmosDBAuthorizationKey_transf.value,CosmosDBDatabaseId_transf.value,CosmosDBCollectionId_transf.value, numeratorId_transf.value,numeratorName_transf.value,numeratorInfo_transf.value,log);
+
+        if (numeratorName==null)
+        {
+            throw new Exception("Can't create numerator without specifying its name!");
+        }
+
+        if (CosmosDBEndpoint_transf.value == null)
+        {
+            throw new Exception("Can't create numerator without specifying the 'CosmosDBEndpoint' parameter!");
+        }
+        if (CosmosDBAuthorizationKey_transf.value == null)
+        {
+            throw new Exception("Can't create numerator without specifying the 'CosmosDBAuthorizationKey' parameter!");
+        }
+        if (CosmosDBDatabaseId_transf.value == null)
+        {
+            throw new Exception("Can't create numerator without specifying the 'CosmosDBDatabaseId' parameter!");
+        }
+        if (CosmosDBCollectionId_transf.value == null)
+        {
+            throw new Exception("Can't create numerator without specifying the 'CosmosDBCollectionId' parameter!");
+        }
+
+        numerator_info = await createNumerator(CosmosDBEndpoint_transf.value, CosmosDBAuthorizationKey_transf.value,CosmosDBDatabaseId_transf.value,CosmosDBCollectionId_transf.value, numeratorId, numeratorName,numeratorInfo_req,log);
 
         statusCode = HttpStatusCode.OK;
         statusMessage = "Numerator successfully created.";
@@ -180,10 +204,19 @@ public static async Task<HttpResponseMessage> Run(HttpRequestMessage req, TraceW
         statusMessage = "Failed to create numerator! Error message: " + CommonNumeratorUtilities.getInnerExceptionMessage(e, null) + ", stackTrace=" + e.StackTrace + ".";
     }
     log.Info(statusMessage);
-    //log.Info("fileInfo="+fileInfo.ToString());
-    JObject ni = new JObject();
-    //ni.Add(numerator_info.ToString());
-    response_body.Add("numerator", JObject.Parse(numerator_info.ToString()));
+    //log.Info("createNumeratorInfo="+createNumeratorInfo.ToString());
+    JObject num = null;
+    try
+    {
+        if (numerator_info != null)
+        {
+            num = JObject.Parse(numerator_info.ToString());
+        }
+    } catch (Exception ex)
+    {
+        log.Warning("Failed to convert numerator document!");
+    }
+    response_body.Add("numerator", num);
     response_body.Add("createNumeratorInfo", createNumeratorInfo);
     response_body.Add("statusCode", (int)statusCode);
     response_body.Add("statusMessage", statusMessage);

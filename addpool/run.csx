@@ -4,14 +4,12 @@
 
 #load "NumeratorCommon.csx"
 
-using System.Linq;
 using System.Net;
 using System.Net.Http;
 using System.Threading.Tasks;
 using Microsoft.Azure.WebJobs;
 using Microsoft.Azure.WebJobs.Host;
 using System;
-using System.Configuration;
 using System.IO;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
@@ -27,12 +25,12 @@ public static async Task<HttpResponseMessage> Run(HttpRequestMessage req, TraceW
     {
         rootloc = Directory.GetParent(rootloc).FullName;
     }
-    log.Info("Exec func: " + Environment.GetEnvironmentVariable("WEBSITE_SITE_NAME") + ", RL=" + rootloc);
+
+    const string DEFAULT_retriesNumber_CODE = "1";
 
     JObject response_body = new JObject();
 
-    //JObject numerator_info = new JObject { };
-    Document numerator_info = new Document();
+    Document numerator_info = null;
     HttpStatusCode statusCode = HttpStatusCode.OK;
     String statusMessage = null;
     // Initialize response info object
@@ -155,64 +153,209 @@ public static async Task<HttpResponseMessage> Run(HttpRequestMessage req, TraceW
         ParamInfo numeratorName_transf = CommonNumeratorUtilities.handleParameter(json, config_json, "numeratorName", true, null, null, null, log);
         CommonNumeratorUtilities.AddResponseParam(addPoolInfo, numeratorName_transf, false, false, false);
 
-        ParamInfo numeratorInfo_transf = CommonNumeratorUtilities.handleParameter(json, config_json, "numeratorInfo", true, null, null, null, log);
-        CommonNumeratorUtilities.AddResponseParam(addPoolInfo, numeratorInfo_transf, false, false, false);
-
         ParamInfo poolPrefix_transf = CommonNumeratorUtilities.handleParameter(json, config_json, "poolPrefix", true, null, null, null, log);
         CommonNumeratorUtilities.AddResponseParam(addPoolInfo, poolPrefix_transf, false, false, false);
 
-        ParamInfo poolFrom_transf = CommonNumeratorUtilities.handleParameter(json, config_json, "poolFrom", true, null, null, null, log);
-        CommonNumeratorUtilities.AddResponseParam(addPoolInfo, poolFrom_transf, false, false, true);
+        string poolFrom = null;
+        if (json != null && json.poolFrom != null)
+        {
+            poolFrom = json.poolFrom;
+        }
+        int? from = null;
+        try
+        {
+            from = Int32.Parse(poolFrom);
+        } catch (Exception ex)
+        {
+            if (firstErrorMsg==null)
+            {
+                firstErrorMsg = "Pool will not be added because the 'poolFrom' parameter value " + (poolFrom==null ? "is not specified!" : "is not an integer!");
+            }
+        }
+        addPoolInfo.Add("poolFrom", from);
 
-        ParamInfo poolTo_transf = CommonNumeratorUtilities.handleParameter(json, config_json, "poolTo", true, null, null, null, log);
-        CommonNumeratorUtilities.AddResponseParam(addPoolInfo, poolTo_transf, false, false, true);
+        string poolTo = null;
+        if (json != null && json.poolTo != null)
+        {
+            poolTo = json.poolTo;
+        }
+        int? to = null;
+        if (poolTo != null)
+        {
+            try
+            {
+                to = Int32.Parse(poolTo);
+            }
+            catch (Exception ex)
+            {
+                if (firstErrorMsg == null)
+                {
+                    firstErrorMsg = "Pool will not be added because the 'poolTo' parameter value is not an integer!";
+                }
+            }
+        }
+        addPoolInfo.Add("poolTo", to);
 
         ParamInfo poolDigits_transf = CommonNumeratorUtilities.handleParameter(json, config_json, "poolDigits", true, null, null, null, log);
         CommonNumeratorUtilities.AddResponseParam(addPoolInfo, poolDigits_transf, false, false, true);
+        int? digits = null;
+        if (poolDigits_transf.value != null)
+        {
+            try
+            {
+                digits = Int32.Parse(poolDigits_transf.value);
+            }
+            catch (Exception ex)
+            {
+                if (firstErrorMsg == null)
+                {
+                    firstErrorMsg = "Pool will not be added because the 'poolDigits' parameter value is not an integer!";
+                }
+            }                    
+        }
 
         ParamInfo poolSuffix_transf = CommonNumeratorUtilities.handleParameter(json, config_json, "poolSuffix", true, null, null, null, log);
         CommonNumeratorUtilities.AddResponseParam(addPoolInfo, poolSuffix_transf, false, false, false);
 
-        ParamInfo poolWho_transf = CommonNumeratorUtilities.handleParameter(json, config_json, "poolWho", true, null, null, null, log);
-        CommonNumeratorUtilities.AddResponseParam(addPoolInfo, poolWho_transf, false, false, false);
+        string poolWho = null;
+        if (json != null && json.poolWho != null)
+        {
+            poolWho = json.poolWho;
+        }
+        addPoolInfo.Add("poolWho", poolWho);
+        if (poolWho == null)
+        {
+            if (firstErrorMsg == null)
+            {
+                firstErrorMsg = "Pool will not be added because the 'poolWho' parameter value is not specified!";
+            }
+        }
 
-        ParamInfo poolWhen_transf = CommonNumeratorUtilities.handleParameter(json, config_json, "poolWhen", true, null, null, null, log);
-        CommonNumeratorUtilities.AddResponseParam(addPoolInfo, poolWhen_transf, false, false, false);
+        string poolWhen = null;
+        JProperty p = json!=null ? json.Property("poolWhen") : null;
+        if (p != null)
+        {
+            if (p.Value.Type == JTokenType.Date)
+            {
+                poolWhen = JsonConvert.SerializeObject(p.Value);
+                poolWhen = poolWhen.Substring(1, poolWhen.Length - 2);
+            }
+            else
+            {
+                poolWhen = p.Value.Value<string>();
+            }
+        }
+        addPoolInfo.Add("poolWhen", poolWhen);
+        if (poolWhen == null)
+        {
+            if (firstErrorMsg == null)
+            {
+                firstErrorMsg = "Pool will not be added because the 'poolWhen' parameter value is not specified!";
+            }
+        }
 
-        ParamInfo poolComment_transf = CommonNumeratorUtilities.handleParameter(json, config_json, "poolComment", true, null, null, null, log);
-        CommonNumeratorUtilities.AddResponseParam(addPoolInfo, poolComment_transf, false, false, false);
+        string poolComment = null;
+        if (json != null && json.poolComment != null)
+        {
+            poolComment = json.poolComment;
+        }
+        addPoolInfo.Add("poolComment", poolComment);
 
-        ParamInfo poolInfo_transf = CommonNumeratorUtilities.handleParameter(json, config_json, "poolInfo", true, null, null, null, log);
-        CommonNumeratorUtilities.AddResponseParam(addPoolInfo, poolInfo_transf, false, false, false);
+        JToken poolInfo_req = null;
+        if (json != null && json.poolInfo != null)
+        {
+            poolInfo_req = json.poolInfo;
+        }
+        addPoolInfo.Add("poolInfo", poolInfo_req);
 
         JToken poolActions_req = null;
         if (json != null && json.poolActions != null)
         {
             poolActions_req = json.poolActions;
         }
-        addPoolInfo.Add("poolActions", poolActions_req);
+        JObject poolActionsObj = new JObject();
+        // Take default poolActions from configuration (if exists)
+        if (config_json != null && config_json.poolActions != null)
+        {
+            poolActionsObj = config_json.poolActions;
+        }                
+
+        // merge objects?
+        poolActionsObj.Merge(poolActionsObj);
+
+        addPoolInfo.Add("poolActions", poolActionsObj);
+
+        ParamInfo retriesNumber_transf = CommonNumeratorUtilities.handleParameter(json, config_json, "retriesNumber", true, null, DEFAULT_retriesNumber_CODE, null, log);
+        CommonNumeratorUtilities.AddResponseParam(addPoolInfo, retriesNumber_transf, false, false, true);
+        int retriesNumber = 1;
+        if (retriesNumber_transf.value != null)
+        {
+            try
+            {
+                retriesNumber = Int32.Parse(retriesNumber_transf.value);
+            }
+            catch (Exception ex)
+            {
+                if (firstErrorMsg == null)
+                {
+                    firstErrorMsg = "Pool will not be added because the 'retriesNumber' parameter value is not an integer!";
+                }
+            }
+        }
+
 
         if (firstErrorMsg != null)
         {
             throw new Exception(firstErrorMsg);
         }
 
-        int? from = null;
-        if (poolFrom_transf.value!=null)
+        if (CosmosDBEndpoint_transf.value == null)
         {
-            from = Int32.Parse(poolFrom_transf.value);
+            throw new Exception("Can't add a pool to numerator without specifying the 'CosmosDBEndpoint' parameter!");
         }
-        int? to = null;
-        if (poolTo_transf.value != null)
+        if (CosmosDBAuthorizationKey_transf.value == null)
         {
-            to = Int32.Parse(poolTo_transf.value);
+            throw new Exception("Can't add a pool to numerator without specifying the 'CosmosDBAuthorizationKey' parameter!");
         }
-        int? digits = null;
-        if (poolDigits_transf.value != null)
+        if (CosmosDBDatabaseId_transf.value == null)
         {
-            digits = Int32.Parse(poolDigits_transf.value);
+            throw new Exception("Can't add a pool to numerator without specifying the 'CosmosDBDatabaseId' parameter!");
         }
-        numerator_info = await addPool(CosmosDBEndpoint_transf.value, CosmosDBAuthorizationKey_transf.value, CosmosDBDatabaseId_transf.value, CosmosDBCollectionId_transf.value, numeratorId_transf.value, numeratorName_transf.value, numeratorInfo_transf.value, poolPrefix_transf.value,from,to, digits, poolSuffix_transf.value, poolWho_transf.value, poolWhen_transf.value, poolComment_transf.value, poolActions_req,poolInfo_transf.value, log);
+        if (CosmosDBCollectionId_transf.value == null)
+        {
+            throw new Exception("Can't add a pool to numerator without specifying the 'CosmosDBCollectionId' parameter!");
+        }
+        if (numeratorId_transf.value == null && numeratorName_transf.value == null)
+        {
+            throw new Exception("Can't add a pool to numerator without specifying either 'numeratorId' or 'numeratorName' parameter (in the request, JSON config or as default app setting)!");
+        }
+
+        // determine if Id or Name should be used...if it is a name, then search if there is appsetting NUMERATOR_%namevalue% ... it is the Id value
+        bool useName = false;
+        if (numeratorName_transf.value != null)
+        {
+            if (numeratorId_transf.value == null)
+            {
+                useName = true;
+            }
+            else if (numeratorId_transf.source > numeratorName_transf.source)
+            {
+                useName = true;
+            }
+        }
+        string id = numeratorId_transf.value;
+        if (useName)
+        {
+            id = null;
+            // now search if there is appsetting NUMEREATOR_ % namevalue % ...it is the Id value
+            string vv = System.Environment.GetEnvironmentVariable(CommonNumeratorUtilities.NUMERATOR_PREFIX + numeratorName_transf.value);
+            if (vv != null)
+            {
+                id = vv;
+            }
+        }
+
+        numerator_info = await addPool(CosmosDBEndpoint_transf.value, CosmosDBAuthorizationKey_transf.value, CosmosDBDatabaseId_transf.value, CosmosDBCollectionId_transf.value, id, numeratorName_transf.value, poolPrefix_transf.value,from,to, digits, poolSuffix_transf.value, poolWho, poolWhen, poolComment, poolActionsObj, poolInfo_req, retriesNumber, log);
 
         statusCode = HttpStatusCode.OK;
         statusMessage = "Pool successfully created.";
@@ -223,10 +366,21 @@ public static async Task<HttpResponseMessage> Run(HttpRequestMessage req, TraceW
         statusMessage = "Failed to create numerator! Error message: " + CommonNumeratorUtilities.getInnerExceptionMessage(e, null) + ", stackTrace=" + e.StackTrace + ".";
     }
     log.Info(statusMessage);
-    //log.Info("fileInfo="+fileInfo.ToString());
-    JObject ni = new JObject();
-    //ni.Add(numerator_info.ToString());
-    response_body.Add("pool", JObject.Parse(numerator_info.ToString()));
+    //log.Info("addPoolInfo="+addPoolInfo.ToString());
+    JObject num = null;
+    try
+    {
+        if (numerator_info != null)
+        {
+            num = JObject.Parse(numerator_info.ToString());
+        }
+    }
+    catch (Exception ex)
+    {
+        log.Warning("Failed to convert numerator document!");
+    }
+
+    response_body.Add("pool", num);
     response_body.Add("addPoolInfo", addPoolInfo);
     response_body.Add("statusCode", (int)statusCode);
     response_body.Add("statusMessage", statusMessage);
@@ -234,7 +388,7 @@ public static async Task<HttpResponseMessage> Run(HttpRequestMessage req, TraceW
     return req.CreateResponse(statusCode, response_body);
 }
 
-private async static Task<Document> addPool(string endpoint, string authorizationKey, string databaseId, string collectionId, string numeratorid, string numeratorname, string numeratorupdateinfo,string prefix, int? from, int? to, int? digits, string suffix, string who, string when, string comment, dynamic actions, dynamic info, TraceWriter log)
+private async static Task<Document> addPool(string endpoint, string authorizationKey, string databaseId, string collectionId, string numeratorid, string numeratorname, string prefix, int? from, int? to, int? digits, string suffix, string who, string when, string comment, dynamic actions, dynamic info, int retriesNumber,TraceWriter log)
 {
     DocumentClient _client = null;
     try
@@ -243,7 +397,7 @@ private async static Task<Document> addPool(string endpoint, string authorizatio
         var dbSetup = new DatabaseSetup(_client, log);
         await dbSetup.Init(databaseId, collectionId);
 
-        var document = await dbSetup.AddPool(numeratorid, numeratorname, numeratorupdateinfo, prefix, from, to, digits, suffix, who, when, comment, actions, info);
+        var document = await dbSetup.AddPool(numeratorid, numeratorname, prefix, from, to, digits, suffix, who, when, comment, actions, info, retriesNumber);
 
         return document;
     }

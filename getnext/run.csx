@@ -4,7 +4,6 @@
 
 #load "NumeratorCommon.csx"
 
-using System.Linq;
 using System.Net;
 using System.Net.Http;
 using System.Threading.Tasks;
@@ -14,7 +13,6 @@ using System;
 using System.IO;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
-using Microsoft.Azure.Documents;
 using Microsoft.Azure.Documents.Client;
 
 public static async Task<HttpResponseMessage> Run(HttpRequestMessage req, TraceWriter log, ExecutionContext context)
@@ -29,15 +27,15 @@ public static async Task<HttpResponseMessage> Run(HttpRequestMessage req, TraceW
         fncname = "GetNext";
     }
     
+    const string DEFAULT_retriesNumber_CODE = "1";
 
     JObject response_body = new JObject();
 
-    //JObject numerator_info = new JObject { };
     string getNext_info = null;
     HttpStatusCode statusCode = HttpStatusCode.OK;
     String statusMessage = null;
     // Initialize response info object
-    JObject createNumeratorInfo = new JObject { };
+    JObject getNextInfo = new JObject { };
 
     try
     {
@@ -134,69 +132,124 @@ public static async Task<HttpResponseMessage> Run(HttpRequestMessage req, TraceW
                 }
             }
         }
-        createNumeratorInfo.Add("lang", lang);
+        getNextInfo.Add("lang", lang);
 
-        CommonNumeratorUtilities.AddResponseParam(createNumeratorInfo, Configuration_transf, false, false, false);
+        CommonNumeratorUtilities.AddResponseParam(getNextInfo, Configuration_transf, false, false, false);
 
         ParamInfo CosmosDBEndpoint_transf = CommonNumeratorUtilities.handleParameter(json, config_json, "CosmosDBEndpoint", true, null, CommonNumeratorUtilities.DEFAULT_CosmosDBEndpoint_CODE, null, log);
-        CommonNumeratorUtilities.AddResponseParam(createNumeratorInfo, CosmosDBEndpoint_transf, false, false, false);
+        CommonNumeratorUtilities.AddResponseParam(getNextInfo, CosmosDBEndpoint_transf, false, false, false);
 
         ParamInfo CosmosDBAuthorizationKey_transf = CommonNumeratorUtilities.handleParameter(json, config_json, "CosmosDBAuthorizationKey", false, null, CommonNumeratorUtilities.DEFAULT_CosmosDBAuthorizationKey_CODE, null, log);
-        CommonNumeratorUtilities.AddResponseParam(createNumeratorInfo, CosmosDBAuthorizationKey_transf, true, false, false);
+        CommonNumeratorUtilities.AddResponseParam(getNextInfo, CosmosDBAuthorizationKey_transf, true, false, false);
 
         ParamInfo CosmosDBDatabaseId_transf = CommonNumeratorUtilities.handleParameter(json, config_json, "CosmosDBDatabaseId", true, null, CommonNumeratorUtilities.DEFAULT_CosmosDBDatabaseId_CODE, null, log);
-        CommonNumeratorUtilities.AddResponseParam(createNumeratorInfo, CosmosDBDatabaseId_transf, false, false, false);
+        CommonNumeratorUtilities.AddResponseParam(getNextInfo, CosmosDBDatabaseId_transf, false, false, false);
 
         ParamInfo CosmosDBCollectionId_transf = CommonNumeratorUtilities.handleParameter(json, config_json, "CosmosDBCollectionId", true, null, CommonNumeratorUtilities.DEFAULT_CosmosDBCollectionId_CODE, null, log);
-        CommonNumeratorUtilities.AddResponseParam(createNumeratorInfo, CosmosDBCollectionId_transf, false, false, false);
+        CommonNumeratorUtilities.AddResponseParam(getNextInfo, CosmosDBCollectionId_transf, false, false, false);
 
         ParamInfo numeratorId_transf = CommonNumeratorUtilities.handleParameter(json, config_json, "numeratorId", true, null, null, null, log);
-        CommonNumeratorUtilities.AddResponseParam(createNumeratorInfo, numeratorId_transf, false, false, false);
+        CommonNumeratorUtilities.AddResponseParam(getNextInfo, numeratorId_transf, false, false, false);
 
         ParamInfo numeratorName_transf = CommonNumeratorUtilities.handleParameter(json, config_json, "numeratorName", true, null, null, null, log);
-        CommonNumeratorUtilities.AddResponseParam(createNumeratorInfo, numeratorName_transf, false, false, false);
+        CommonNumeratorUtilities.AddResponseParam(getNextInfo, numeratorName_transf, false, false, false);
 
-        ParamInfo numeratorInfo_transf = CommonNumeratorUtilities.handleParameter(json, config_json, "numeratorInfo", true, null, null, null, log);
-        CommonNumeratorUtilities.AddResponseParam(createNumeratorInfo, numeratorInfo_transf, false, false, false);
-        
-        
-        /*
         JToken numeratorInfo_req = null;
         if (json != null && json.numeratorInfo != null)
         {
             numeratorInfo_req = json.numeratorInfo;
         }
-        createNumeratorInfo.Add("numeratorInfo", numeratorInfo_req);
-        */
+        getNextInfo.Add("numeratorInfo", numeratorInfo_req);
+
+        ParamInfo retriesNumber_transf = CommonNumeratorUtilities.handleParameter(json, config_json, "retriesNumber", true, null, DEFAULT_retriesNumber_CODE, null, log);
+        CommonNumeratorUtilities.AddResponseParam(getNextInfo, retriesNumber_transf, false, false, true);
+        int retriesNumber = 1;
+        if (retriesNumber_transf.value != null)
+        {
+            try
+            {
+                retriesNumber = Int32.Parse(retriesNumber_transf.value);
+            }
+            catch (Exception ex)
+            {
+                if (firstErrorMsg == null)
+                {
+                    firstErrorMsg = "getNext won't be executed because the 'retriesNumber' parameter value is not an integer!";
+                }
+            }
+        }
 
         if (firstErrorMsg != null)
         {
             throw new Exception(firstErrorMsg);
         }
 
-        getNext_info = await getNext(CosmosDBEndpoint_transf.value, CosmosDBAuthorizationKey_transf.value, CosmosDBDatabaseId_transf.value, CosmosDBCollectionId_transf.value, numeratorId_transf.value, numeratorName_transf.value, numeratorInfo_transf.value, fncname, log);
+        if (CosmosDBEndpoint_transf.value == null)
+        {
+            throw new Exception("Can't execute getNext without specifying the 'CosmosDBEndpoint' parameter!");
+        }
+        if (CosmosDBAuthorizationKey_transf.value == null)
+        {
+            throw new Exception("Can't execute getNext without specifying the 'CosmosDBAuthorizationKey' parameter!");
+        }
+        if (CosmosDBDatabaseId_transf.value == null)
+        {
+            throw new Exception("Can't execute getNext without specifying the 'CosmosDBDatabaseId' parameter!");
+        }
+        if (CosmosDBCollectionId_transf.value == null)
+        {
+            throw new Exception("Can't execute getNext without specifying the 'CosmosDBCollectionId' parameter!");
+        }
+        if (numeratorId_transf.value==null && numeratorName_transf.value==null)
+        {
+            throw new Exception("Can't execute getNext without specifying either 'numeratorId' or 'numeratorName' parameter (in the request, JSON config or as default app setting)!");
+        }
+
+        // determine if Id or Name should be used...if it is a name, then search if there is appsetting NUMERATOR_%namevalue% ... it is the Id value
+        bool useName = false;
+        if (numeratorName_transf.value != null)
+        {
+            if (numeratorId_transf.value == null)
+            {
+                useName = true;
+            } else if (numeratorId_transf.source>numeratorName_transf.source)
+            {
+                    useName = true;
+            }                    
+        }
+        string id = numeratorId_transf.value;
+        if (useName)
+        {
+            id = null;
+            // now search if there is appsetting NUMERATOR_ % namevalue % ...it is the Id value
+            string vv = System.Environment.GetEnvironmentVariable(CommonNumeratorUtilities.NUMERATOR_PREFIX + numeratorName_transf.value);
+            if (vv != null)
+            {
+                id = vv;
+            }
+        }
+
+        getNext_info = await getNext(CosmosDBEndpoint_transf.value, CosmosDBAuthorizationKey_transf.value, CosmosDBDatabaseId_transf.value, CosmosDBCollectionId_transf.value, id, numeratorName_transf.value, numeratorInfo_req, fncname, retriesNumber, req.RequestUri.Scheme, log);
 
         statusCode = HttpStatusCode.OK;
-        statusMessage = "Numerator successfully created.";
+        statusMessage = "getNext numerator number successfully returned.";
     }
     catch (Exception e)
     {
         statusCode = HttpStatusCode.InternalServerError;
-        statusMessage = "Failed to create numerator! Error message: " + CommonNumeratorUtilities.getInnerExceptionMessage(e, null) + ", stackTrace=" + e.StackTrace + ".";
+        statusMessage = "Failed to execute getNext! Error message: " + CommonNumeratorUtilities.getInnerExceptionMessage(e, null) + ", stackTrace=" + e.StackTrace + ".";
     }
     log.Info(statusMessage);
-    //log.Info("fileInfo="+fileInfo.ToString());
-    JObject ni = new JObject();
-    //ni.Add(numerator_info.ToString());
+    //log.Info("getNextInfo="+getNextInfo.ToString());
     response_body.Add("getNext", getNext_info);
-    response_body.Add("getNextInfo", createNumeratorInfo);
+    response_body.Add("getNextInfo", getNextInfo);
     response_body.Add("statusCode", (int)statusCode);
     response_body.Add("statusMessage", statusMessage);
 
     return req.CreateResponse(statusCode, response_body);
 }
 
-private async static Task<string> getNext(string endpoint, string authorizationKey, string databaseId, string collectionId, string id, string name, dynamic info, string fncname, TraceWriter log)
+private async static Task<string> getNext(string endpoint, string authorizationKey, string databaseId, string collectionId, string id, string name, dynamic info, string fncname, int retriesNumber, string reqschema, TraceWriter log)
 {
     DocumentClient _client = null;
     try
@@ -205,8 +258,54 @@ private async static Task<string> getNext(string endpoint, string authorizationK
         var dbSetup = new DatabaseSetup(_client, log);
         await dbSetup.Init(databaseId, collectionId);
 
-        string ret = await dbSetup.GetNext(id, name, info, fncname);
-        return ret;
+        NumeratorInfo ni = await dbSetup.GetNext(id, name, info, fncname, retriesNumber);
+        processActions(ni.doc, ni.pool, endpoint, authorizationKey, databaseId, collectionId, id, name, info, fncname, reqschema,log);
+        log.Info("Numerator retrieved...");
+        return ni.value;
+    }
+    catch (Exception ex)
+    {
+        throw ex;
+    }
+    finally
+    {
+        if (_client != null)
+        {
+            _client.Dispose();
+        }
+    }
+}
+
+private async static Task processActions(dynamic doc, dynamic pool, string endpoint, string authorizationKey, string databaseId, string collectionId, string id, string name, dynamic info, string fncname, string reqschema, TraceWriter log)
+{
+    DocumentClient _client = null;
+    try
+    {
+        log.Info("Started processing actions...");
+
+        if (pool.actions!=null)
+        {
+            foreach (dynamic act in pool.actions)
+            {
+                //log.Info("T=" + act.threshold);
+                //log.Info("U=" + act.actionCall);
+                if (act.threshold != null && act.threshold >= pool.next-pool.from && act.actionHandled!=null && !act.actionHandled)
+                {
+                    log.Info("ACTION WILL BE EXECUTED!");
+                    var content = new StringContent(JsonConvert.SerializeObject(doc), System.Text.Encoding.UTF8, "application/json");
+                    string fullurl = reqschema+"://" + System.Environment.GetEnvironmentVariable("WEBSITE_HOSTNAME")+act.actionCall;
+                    log.Info("FURL=" + fullurl);
+                    HttpResponseMessage response = await client.PostAsync(fullurl, content);
+                    if (response.StatusCode != HttpStatusCode.OK) 
+                    {
+
+                    }
+                    log.Info("RESP=" + response);
+                }
+            }
+        }
+        log.Info("Ended processing actions...");
+
     }
     catch (Exception ex)
     {
