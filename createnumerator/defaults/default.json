@@ -1,0 +1,14 @@
+{  
+"poolActions":
+
+[
+{
+"threshold":666,
+"actionCall":"/my1sturl{id}-{name}-{label}-{type}-{prefix}-{from}-{to}-{digits}-{suffix}-{who}-{when}-{comment}-{info}"
+},
+{
+"threshold":888,
+"actionCall":"/my2ndurl{id}-{name}-{label}-{type}-{prefix}-{from}-{to}-{digits}-{suffix}-{who}-{when}-{comment}-{info}"
+}
+]
+}
