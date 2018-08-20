@@ -502,6 +502,7 @@ public class DatabaseSetup
                     nn = p.next;
                     // update next number in the pool
                     p.next = p.next + 1;
+                    p.updated = numeratorupdateinfo;
                     mypool = p;
                     if (p.to!=null && p.next>p.to)
                     {
