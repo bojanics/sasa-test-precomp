@@ -13,6 +13,7 @@ using System;
 using System.IO;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
+using Microsoft.Azure.Documents;
 using Microsoft.Azure.Documents.Client;
 
 private static readonly HttpClient client = new HttpClient();
@@ -262,7 +263,6 @@ private async static Task<string> getNext(string endpoint, string authorizationK
 
         NumeratorInfo ni = await dbSetup.GetNext(id, name, info, fncname, retriesNumber);
         processActions(ni.doc, ni.pool, endpoint, authorizationKey, databaseId, collectionId, id, name, info, fncname, reqschema,log);
-        log.Info("Numerator retrieved...");
         return ni.value;
     }
     catch (Exception ex)
@@ -278,25 +278,22 @@ private async static Task<string> getNext(string endpoint, string authorizationK
     }
 }
 
-private async static Task processActions(dynamic doc, dynamic pool, string endpoint, string authorizationKey, string databaseId, string collectionId, string id, string name, dynamic info, string fncname, string reqschema, TraceWriter log)
+private async static Task processActions(Document doc, dynamic pool, string endpoint, string authorizationKey, string databaseId, string collectionId, string id, string name, dynamic info, string fncname, string reqschema, TraceWriter log)
 {
     DocumentClient _client = null;
     try
     {
-        log.Info("Started processing actions...");
-
         if (pool.actions!=null)
         {
             foreach (dynamic act in pool.actions)
             {
                 //log.Info("T=" + act.threshold);
                 //log.Info("U=" + act.actionCall);
-                if (act.threshold != null && act.threshold >= pool.next-pool.from && act.actionHandled!=null && !act.actionHandled)
+                if (act.threshold != null && act.threshold == pool.next-pool.from)
                 {
-                    log.Info("ACTION WILL BE EXECUTED!");
-                    var content = new StringContent(JsonConvert.SerializeObject(doc), System.Text.Encoding.UTF8, "application/json");
+                    dynamic content = new StringContent(JsonConvert.SerializeObject(doc), System.Text.Encoding.UTF8, "application/json");
                     string fullurl = reqschema+"://" + System.Environment.GetEnvironmentVariable("WEBSITE_HOSTNAME")+act.actionCall;
-                    log.Info("FURL=" + fullurl);
+                    log.Info("Threshold " + act.threshold + " will fire POST action to URL: " + fullurl);
                     HttpResponseMessage response = await client.PostAsync(fullurl, content);
                     if (response.StatusCode != HttpStatusCode.OK) 
                     {
@@ -306,8 +303,6 @@ private async static Task processActions(dynamic doc, dynamic pool, string endpo
                 }
             }
         }
-        log.Info("Ended processing actions...");
-
     }
     catch (Exception ex)
     {

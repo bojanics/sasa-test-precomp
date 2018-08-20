@@ -268,12 +268,12 @@ public static async Task<HttpResponseMessage> Run(HttpRequestMessage req, TraceW
         }
         addPoolInfo.Add("poolInfo", poolInfo_req);
 
-        JToken poolActions_req = null;
+        JArray poolActions_req = new JArray();
         if (json != null && json.poolActions != null)
         {
             poolActions_req = json.poolActions;
         }
-        JObject poolActionsObj = new JObject();
+        JArray poolActionsObj = new JArray();
         // Take default poolActions from configuration (if exists)
         if (config_json != null && config_json.poolActions != null)
         {
@@ -281,7 +281,7 @@ public static async Task<HttpResponseMessage> Run(HttpRequestMessage req, TraceW
         }                
 
         // merge objects?
-        poolActionsObj.Merge(poolActionsObj);
+        poolActionsObj.Merge(poolActions_req, new JsonMergeSettings { MergeArrayHandling = MergeArrayHandling.Union });
 
         addPoolInfo.Add("poolActions", poolActionsObj);
 

@@ -354,8 +354,9 @@ public class DatabaseSetup
         }
     }
 
-    private async Task<Document> GetNumerator(string numeratorid, string numeratorname, dynamic numeratorupdateinfo)
+    private async Task<NumeratorInfo> GetNumerator(string numeratorid, string numeratorname, dynamic numeratorupdateinfo)
     {
+        NumeratorInfo ni = new NumeratorInfo();
         dynamic doc = null;
         if (numeratorid != null && !numeratorid.Trim().Equals(""))
         {
@@ -374,8 +375,14 @@ public class DatabaseSetup
         if (doc == null)
         {
             doc = await CreateNumerator(numeratorid, numeratorname, numeratorupdateinfo);
+            ni.doc = doc;
+            ni.isNew = true;
+        } else
+        {
+            ni.doc = doc;
+            ni.isNew = false;
         }
-        return doc;
+        return ni;
     }
 
     public async Task<Document> AddPool(string numeratorid, string numeratorname, string prefix, int? from, int? to, int? digits, string suffix, string who, string when, string comment, dynamic actions, dynamic info, int maxattempts)
@@ -386,14 +393,18 @@ public class DatabaseSetup
         {
             maxattempts = 1;
         }
-        dynamic doc = null;
         for (int cntattempts = 0; cntattempts < maxattempts; cntattempts++)
         {
             beforeConcurrentReq = false;
             afterConcurrentReq = false;
         try
         {
-            doc = await GetNumerator(numeratorid, numeratorname, info);
+            NumeratorInfo ni = await GetNumerator(numeratorid, numeratorname, info);
+            dynamic doc = ni.doc;
+            if (numeratorid == null)
+            {
+                numeratorid = doc.id;
+            }
             int cnt = 0;
             try
             {
@@ -418,6 +429,7 @@ public class DatabaseSetup
             beforeConcurrentReq = true;
             doc = await Client.ReplaceDocumentAsync(doc._self, doc, new RequestOptions { AccessCondition = ac });
             afterConcurrentReq = true;
+            return doc;
         }
         catch (Exception ex)
             {
@@ -433,7 +445,7 @@ public class DatabaseSetup
                 }
             }
         }
-        return doc;
+        return null;
     }
 
     public async Task<NumeratorInfo> GetNext(string numeratorid, string numeratorname, dynamic numeratorupdateinfo, string fncname, int maxattempts)
@@ -445,7 +457,7 @@ public class DatabaseSetup
         {
             maxattempts = 1;
         }
-        dynamic doc = null;
+        NumeratorInfo ni = null;
         for (int cntattempts = 0; cntattempts < maxattempts; cntattempts++)
         {
             beforeConcurrentReq = false;
@@ -454,7 +466,12 @@ public class DatabaseSetup
         {
             long t1 = DateTimeOffset.Now.ToUnixTimeMilliseconds();
 //          log.Info("Getting numerator doc for thread " + System.Threading.Thread.CurrentThread.Name);
-            doc = await GetNumerator(numeratorid, numeratorname, numeratorupdateinfo);
+            ni = await GetNumerator(numeratorid, numeratorname, numeratorupdateinfo);
+            dynamic doc = ni.doc;
+            if (numeratorid==null)
+            {
+                numeratorid = doc.id;
+            }
             long t2 = DateTimeOffset.Now.ToUnixTimeMilliseconds();
 //            log.Info((t2-t1)+": Numerator retrieved for thread " + System.Threading.Thread.CurrentThread.Name);
             int cnt = 0;
@@ -465,7 +482,8 @@ public class DatabaseSetup
             catch (Exception ex)
             {
             }
-            if (cnt == 0)
+            // create pool only if no pools and the numerator is newly created
+            if (cnt == 0 && ni.isNew)
             {
                 doc = await AddPool(numeratorid, numeratorname, null, 1, null, null, null, "Function '"+fncname+"'", DateTimeOffset.Now.ToUniversalTime().ToString("yyyy'-'MM'-'dd'T'HH':'mm':'ss'.'fff'Z'"), "Numerator document was not found and was created by function '" + fncname + "'", null, numeratorupdateinfo, maxattempts);
                 cnt = 1;
@@ -582,7 +600,7 @@ public class DatabaseSetup
                 nextnum += mypool.suffix; // add suffix
             }
 
-                NumeratorInfo ni = new NumeratorInfo();
+                ni = new NumeratorInfo();
                 ni.value = nextnum;
                 ni.pool = mypool;
                 ni.doc = doc;
@@ -605,7 +623,7 @@ public class DatabaseSetup
                 //log.Info((t4 - t3) + ": exception when replace docu logic for thread " + System.Threading.Thread.CurrentThread.Name);
             }
         }
-        return doc;
+        return null;
     }
 }
 
@@ -613,5 +631,7 @@ public class NumeratorInfo
 {
     public string value { get; set; }
     public dynamic pool { get; set; }
-    public dynamic doc { get; set; }
+    public Document doc { get; set; }
+    public bool isNew { get; set; }
+}
 }
