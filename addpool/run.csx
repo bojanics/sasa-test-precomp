@@ -223,13 +223,6 @@ public static async Task<HttpResponseMessage> Run(HttpRequestMessage req, TraceW
             poolWho = json.poolWho;
         }
         addPoolInfo.Add("poolWho", poolWho);
-        if (poolWho == null)
-        {
-            if (firstErrorMsg == null)
-            {
-                firstErrorMsg = "Pool will not be added because the 'poolWho' parameter value is not specified!";
-            }
-        }
 
         string poolWhen = null;
         JProperty p = json!=null ? json.Property("poolWhen") : null;
@@ -246,13 +239,6 @@ public static async Task<HttpResponseMessage> Run(HttpRequestMessage req, TraceW
             }
         }
         addPoolInfo.Add("poolWhen", poolWhen);
-        if (poolWhen == null)
-        {
-            if (firstErrorMsg == null)
-            {
-                firstErrorMsg = "Pool will not be added because the 'poolWhen' parameter value is not specified!";
-            }
-        }
 
         string poolComment = null;
         if (json != null && json.poolComment != null)
@@ -330,23 +316,10 @@ public static async Task<HttpResponseMessage> Run(HttpRequestMessage req, TraceW
             throw new Exception("Can't add a pool to numerator without specifying either 'numeratorId' or 'numeratorName' parameter (in the request, JSON config or as default app setting)!");
         }
 
-        // determine if Id or Name should be used...if it is a name, then search if there is appsetting NUMERATOR_%namevalue% ... it is the Id value
-        bool useName = false;
-        if (numeratorName_transf.value != null)
-        {
-            if (numeratorId_transf.value == null)
-            {
-                useName = true;
-            }
-            else if (numeratorId_transf.source > numeratorName_transf.source)
-            {
-                useName = true;
-            }
-        }
+        // determine if Id or Name should be used...if it is a name(when Id is null), then search if there is appsetting NUMERATOR_%namevalue% ... it is the Id value
         string id = numeratorId_transf.value;
-        if (useName)
+        if (id==null)
         {
-            id = null;
             // now search if there is appsetting NUMEREATOR_ % namevalue % ...it is the Id value
             string vv = System.Environment.GetEnvironmentVariable(CommonNumeratorUtilities.NUMERATOR_PREFIX + numeratorName_transf.value);
             if (vv != null)

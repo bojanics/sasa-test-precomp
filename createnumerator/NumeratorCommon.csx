@@ -16,8 +16,8 @@ using Newtonsoft.Json.Linq;
 public static class CommonNumeratorUtilities
 {
     // Some constants for code defaults
-    public const string DEFAULT_CosmosDBEndpoint_CODE = "https://sasa-test.documents.azure.com:443";
-    public const string DEFAULT_CosmosDBAuthorizationKey_CODE = "XRysJNSllsVfZV5LAdh8YIrzOIGigtL6J5Y02syXquUh1SE7bFP9vdkJLFBsrGqRyd4wYsQgoP6SN5yxgDcjOQ==";
+    public const string DEFAULT_CosmosDBEndpoint_CODE = "https://numerator-test.documents.azure.com:443";
+    public const string DEFAULT_CosmosDBAuthorizationKey_CODE = "XRysJNSrlsLfAZ5LAdh8YIrzEIGigtL6J5Y02syXquqh3Ss7bFP9vdkJLFBsrGqRyd8wYsQgoP6SN5yxgDchOQ==";
     public const string DEFAULT_CosmosDBDatabaseId_CODE = "test-numerator";
     public const string DEFAULT_CosmosDBCollectionId_CODE = "numberpools";
     public const string NUMERATOR_PREFIX = "NUMERATOR_";
@@ -297,39 +297,50 @@ public class DatabaseSetup
 
     private async Task<Database> GetOrCreateDatabaseAsync(string databaseId)
     {
+        dynamic database = null;
         try
         {
-            var database = Client.CreateDatabaseQuery()
+            database = Client.CreateDatabaseQuery()
                                .Where(db => db.Id == databaseId)
                                .ToArray()
-                               .FirstOrDefault() ?? await Client.CreateDatabaseAsync(new Database { Id = databaseId });
-
-            return database;
+                               .FirstOrDefault();
         }
         catch (Exception ex)
         {
-            throw new Exception("Failed to get or create database with Id=" + databaseId, ex);
+            throw new Exception("Failed to get database with Id '" + databaseId+ "' for CosmosDB '" + Client.ServiceEndpoint+"'", ex);
         }
+        if (database == null)
+        {
+            throw new Exception("There is no database with Id '" + databaseId+"' for CosmosDB '"+Client.ServiceEndpoint + "'");
+        }
+
+        return database;
+
     }
 
     private async Task<DocumentCollection> GetOrCreateCollectionAsync(string databaseId, string collectionId)
     {
+        dynamic collection = null;
         try
         {
             var databaseUri = UriFactory.CreateDatabaseUri(databaseId);
 
-        var collection = Client.CreateDocumentCollectionQuery(databaseUri)
+            collection = Client.CreateDocumentCollectionQuery(databaseUri)
                              .Where(c => c.Id == collectionId)
                              .AsEnumerable()
-                             .FirstOrDefault() ??
-                         await Client.CreateDocumentCollectionAsync(databaseUri, new DocumentCollection { Id = collectionId });
+                             .FirstOrDefault();
 
-        return collection;
         }
         catch (Exception ex)
         {
-            throw new Exception("Failed to get or create collection with Id=" + collectionId+" for databaseId="+databaseId, ex);
+            throw new Exception("Failed to get collection with Id '" + collectionId+"' in database '"+databaseId+"' for CosmosDB '" + Client.ServiceEndpoint + "'", ex);
         }
+        if (collection== null)
+        {
+            throw new Exception("There is no collection with Id '" + collectionId + "' in database '"+databaseId + "' for CosmosDB '" + Client.ServiceEndpoint + "'");
+        }
+
+        return collection;
     }
 
     public async Task Init(string databaseId, string collectionId)
@@ -375,6 +386,11 @@ public class DatabaseSetup
         if (doc == null)
         {
             doc = await CreateNumerator(numeratorid, numeratorname, numeratorupdateinfo);
+            // If numerator is given by name, find it again after creation to make sure we will always use the 1st one created in the case of concurrency
+            if (numeratorid == null)
+            {
+                doc = Client.CreateDocumentQuery<dynamic>(Collection.SelfLink, "SELECT * from c WHERE c.name='" + numeratorname + "' AND c.label='numerator' AND c.type='pool'").AsEnumerable().FirstOrDefault();
+            }
             ni.doc = doc;
             ni.isNew = true;
         } else
@@ -433,7 +449,7 @@ public class DatabaseSetup
         }
         catch (Exception ex)
             {
-                log.Info("Failed attempt number " + (cntattempts + 1));
+            	log.Info("AddPool - Failed attempt number " + (cntattempts + 1));
                 if (cntattempts==maxattempts-1 || !beforeConcurrentReq)
                 {
                     string addMsg = "";
@@ -482,8 +498,17 @@ public class DatabaseSetup
             catch (Exception ex)
             {
             }
-            // create pool only if no pools and the numerator is newly created
-            if (cnt == 0 && ni.isNew)
+            int cnthistory = 0;
+            try
+            {
+                cnthistory = doc.history.Count;
+            }
+            catch (Exception ex)
+            {
+            }
+
+            // create pool only if no pools and no history
+            if (cnt == 0 && cnthistory==0)
             {
                 doc = await AddPool(numeratorid, numeratorname, null, 1, null, null, null, "Function '"+fncname+"'", DateTimeOffset.Now.ToUniversalTime().ToString("yyyy'-'MM'-'dd'T'HH':'mm':'ss'.'fff'Z'"), "Numerator document was not found and was created by function '" + fncname + "'", null, numeratorupdateinfo, maxattempts);
                 cnt = 1;
@@ -525,14 +550,6 @@ public class DatabaseSetup
             dynamic eop = new ExpandoObject();
 
             dynamic eoh = new ExpandoObject();
-            int cnthistory = 0;
-            try
-            {
-                cnthistory = doc.history.Count;
-            }
-            catch (Exception ex)
-            {
-            }
             eoh.history = new dynamic[cnthistory + useduppools.Count];
             if (useduppools.Count>0)
             {
@@ -605,12 +622,12 @@ public class DatabaseSetup
                 ni.value = nextnum;
                 ni.pool = mypool;
                 ni.doc = doc;
-                log.Info("-------------NUM=" + nextnum + "------------");
+                log.Info("-------------Numerator-GetNext:" + nextnum + "------------");
                 return ni;
             }
             catch (Exception ex)
             {
-                log.Info("Failed attempt number " + (cntattempts + 1));
+            	log.Info("GetNext - Failed attempt number " + (cntattempts + 1));
                 if (cntattempts == maxattempts - 1 || !beforeConcurrentReq)
                 {
                     string addMsg = "";
