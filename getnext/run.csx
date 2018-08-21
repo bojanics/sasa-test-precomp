@@ -232,7 +232,7 @@ public static async Task<HttpResponseMessage> Run(HttpRequestMessage req, TraceW
     }
     log.Info(statusMessage);
     //log.Info("getNextInfo="+getNextInfo.ToString());
-    response_body.Add("getNext", getNext_info);
+    response_body.Add("next", getNext_info);
     response_body.Add("getNextInfo", getNextInfo);
     response_body.Add("statusCode", (int)statusCode);
     response_body.Add("statusMessage", statusMessage);

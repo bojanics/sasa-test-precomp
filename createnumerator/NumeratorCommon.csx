@@ -392,16 +392,14 @@ public class DatabaseSetup
                 doc = Client.CreateDocumentQuery<dynamic>(Collection.SelfLink, "SELECT * from c WHERE c.name='" + numeratorname + "' AND c.label='numerator' AND c.type='pool'").AsEnumerable().FirstOrDefault();
             }
             ni.doc = doc;
-            ni.isNew = true;
         } else
         {
             ni.doc = doc;
-            ni.isNew = false;
         }
         return ni;
     }
 
-    public async Task<Document> AddPool(string numeratorid, string numeratorname, string prefix, int? from, int? to, int? digits, string suffix, string who, string when, string comment, dynamic actions, dynamic info, int maxattempts)
+    public async Task<NumeratorInfo> AddPool(string numeratorid, string numeratorname, string prefix, int? from, int? to, int? digits, string suffix, string who, string when, string comment, dynamic actions, dynamic info, int maxattempts)
     {
         bool beforeConcurrentReq = false;
         bool afterConcurrentReq = false;
@@ -436,7 +434,8 @@ public class DatabaseSetup
                 eop.pools[i] = doc.pools[i];
             }
             dynamic nullvalue = null;
-            eop.pools[cnt] = new { prefix = prefix, from = from, to = to, next = from, digits=digits,suffix=suffix,who=who,when=when,comment=comment,actions=actions,created=info,updated = nullvalue};
+            dynamic newpool = new { prefix = prefix, from = from, to = to, next = from, digits = digits, suffix = suffix, who = who, when = when, comment = comment, actions = actions, created = info, updated = nullvalue };
+            eop.pools[cnt] = newpool;
             doc.pools = eop.pools;
 
             doc.updated = info;
@@ -445,7 +444,9 @@ public class DatabaseSetup
             beforeConcurrentReq = true;
             doc = await Client.ReplaceDocumentAsync(doc._self, doc, new RequestOptions { AccessCondition = ac });
             afterConcurrentReq = true;
-            return doc;
+            ni.doc = doc;
+            ni.pool = newpool;
+            return ni;
         }
         catch (Exception ex)
             {
@@ -510,7 +511,8 @@ public class DatabaseSetup
             // create pool only if no pools and no history
             if (cnt == 0 && cnthistory==0)
             {
-                doc = await AddPool(numeratorid, numeratorname, null, 1, null, null, null, "Function '"+fncname+"'", DateTimeOffset.Now.ToUniversalTime().ToString("yyyy'-'MM'-'dd'T'HH':'mm':'ss'.'fff'Z'"), "Numerator document was not found and was created by function '" + fncname + "'", null, numeratorupdateinfo, maxattempts);
+                NumeratorInfo nip = await AddPool(numeratorid, numeratorname, null, 1, null, null, null, "Function '"+fncname+"'", DateTimeOffset.Now.ToUniversalTime().ToString("yyyy'-'MM'-'dd'T'HH':'mm':'ss'.'fff'Z'"), "Numerator document was not found and was created by function '" + fncname + "'", null, numeratorupdateinfo, maxattempts);
+                doc = nip.doc;
                 cnt = 1;
             }
             doc.updated = numeratorupdateinfo;
@@ -650,6 +652,5 @@ public class NumeratorInfo
     public string value { get; set; }
     public dynamic pool { get; set; }
     public Document doc { get; set; }
-    public bool isNew { get; set; }
 }
 

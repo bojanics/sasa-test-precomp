@@ -30,7 +30,7 @@ public static async Task<HttpResponseMessage> Run(HttpRequestMessage req, TraceW
 
     JObject response_body = new JObject();
 
-    Document numerator_info = null;
+    dynamic numerator_info = null;
     HttpStatusCode statusCode = HttpStatusCode.OK;
     String statusMessage = null;
     // Initialize response info object
@@ -340,20 +340,20 @@ public static async Task<HttpResponseMessage> Run(HttpRequestMessage req, TraceW
     }
     log.Info(statusMessage);
     //log.Info("addPoolInfo="+addPoolInfo.ToString());
-    JObject num = null;
+    JObject pool = null;
     try
     {
         if (numerator_info != null)
         {
-            num = JObject.Parse(numerator_info.ToString());
+            pool = JObject.Parse(JsonConvert.SerializeObject(numerator_info));
         }
     }
     catch (Exception ex)
     {
-        log.Warning("Failed to convert numerator document!");
+        log.Warning("Failed to convert numerator's pool to JSON!");
     }
 
-    response_body.Add("pool", num);
+    response_body.Add("pool", pool);
     response_body.Add("addPoolInfo", addPoolInfo);
     response_body.Add("statusCode", (int)statusCode);
     response_body.Add("statusMessage", statusMessage);
@@ -361,7 +361,7 @@ public static async Task<HttpResponseMessage> Run(HttpRequestMessage req, TraceW
     return req.CreateResponse(statusCode, response_body);
 }
 
-private async static Task<Document> addPool(string endpoint, string authorizationKey, string databaseId, string collectionId, string numeratorid, string numeratorname, string prefix, int? from, int? to, int? digits, string suffix, string who, string when, string comment, dynamic actions, dynamic info, int retriesNumber,TraceWriter log)
+private async static Task<dynamic> addPool(string endpoint, string authorizationKey, string databaseId, string collectionId, string numeratorid, string numeratorname, string prefix, int? from, int? to, int? digits, string suffix, string who, string when, string comment, dynamic actions, dynamic info, int retriesNumber,TraceWriter log)
 {
     DocumentClient _client = null;
     try
@@ -370,9 +370,9 @@ private async static Task<Document> addPool(string endpoint, string authorizatio
         var dbSetup = new DatabaseSetup(_client, log);
         await dbSetup.Init(databaseId, collectionId);
 
-        var document = await dbSetup.AddPool(numeratorid, numeratorname, prefix, from, to, digits, suffix, who, when, comment, actions, info, retriesNumber);
+        NumeratorInfo ni = await dbSetup.AddPool(numeratorid, numeratorname, prefix, from, to, digits, suffix, who, when, comment, actions, info, retriesNumber);
 
-        return document;
+        return ni.pool;
     }
     catch (Exception ex)
     {
