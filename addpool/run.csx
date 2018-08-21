@@ -336,7 +336,7 @@ public static async Task<HttpResponseMessage> Run(HttpRequestMessage req, TraceW
     catch (Exception e)
     {
         statusCode = HttpStatusCode.InternalServerError;
-        statusMessage = "Failed to create numerator! Error message: " + CommonNumeratorUtilities.getInnerExceptionMessage(e, null) + ", stackTrace=" + e.StackTrace + ".";
+        statusMessage = "Failed to add a pool to numerator! Error message: " + CommonNumeratorUtilities.getInnerExceptionMessage(e, null) + ", stackTrace=" + e.StackTrace + ".";
     }
     log.Info(statusMessage);
     //log.Info("addPoolInfo="+addPoolInfo.ToString());
