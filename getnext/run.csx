@@ -30,7 +30,7 @@ public static async Task<HttpResponseMessage> Run(HttpRequestMessage req, TraceW
         fncname = "GetNext";
     }
     
-    const string DEFAULT_retriesNumber_CODE = "1";
+    const string DEFAULT_numberOfRetries_CODE = "1";
 
     JObject response_body = new JObject();
 
@@ -164,20 +164,20 @@ public static async Task<HttpResponseMessage> Run(HttpRequestMessage req, TraceW
         }
         getNextInfo.Add("numeratorInfo", numeratorInfo_req);
 
-        ParamInfo retriesNumber_transf = CommonNumeratorUtilities.handleParameter(json, config_json, "retriesNumber", true, null, DEFAULT_retriesNumber_CODE, null, log);
-        CommonNumeratorUtilities.AddResponseParam(getNextInfo, retriesNumber_transf, false, false, true);
-        int retriesNumber = 1;
-        if (retriesNumber_transf.value != null)
+        ParamInfo numberOfRetries_transf = CommonNumeratorUtilities.handleParameter(json, config_json, "numberOfRetries", true, null, DEFAULT_numberOfRetries_CODE, null, log);
+        CommonNumeratorUtilities.AddResponseParam(getNextInfo, numberOfRetries_transf, false, false, true);
+        int numberOfRetries = 1;
+        if (numberOfRetries_transf.value != null)
         {
             try
             {
-                retriesNumber = Int32.Parse(retriesNumber_transf.value);
+                numberOfRetries = Int32.Parse(numberOfRetries_transf.value);
             }
             catch (Exception ex)
             {
                 if (firstErrorMsg == null)
                 {
-                    firstErrorMsg = "getNext won't be executed because the 'retriesNumber' parameter value is not an integer!";
+                    firstErrorMsg = "getNext won't be executed because the 'numberOfRetries' parameter value is not an integer!";
                 }
             }
         }
@@ -220,7 +220,7 @@ public static async Task<HttpResponseMessage> Run(HttpRequestMessage req, TraceW
             }
         }
 
-        getNext_info = await getNext(CosmosDBEndpoint_transf.value, CosmosDBAuthorizationKey_transf.value, CosmosDBDatabaseId_transf.value, CosmosDBCollectionId_transf.value, id, numeratorName_transf.value, numeratorInfo_req, fncname, retriesNumber, req.RequestUri.Scheme, log);
+        getNext_info = await getNext(CosmosDBEndpoint_transf.value, CosmosDBAuthorizationKey_transf.value, CosmosDBDatabaseId_transf.value, CosmosDBCollectionId_transf.value, id, numeratorName_transf.value, numeratorInfo_req, fncname, numberOfRetries, req.RequestUri.Scheme, log);
 
         statusCode = HttpStatusCode.OK;
         statusMessage = "getNext numerator number successfully returned.";

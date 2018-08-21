@@ -1,14 +1,16 @@
-{  
-"poolActions":
-
-[
 {
-"threshold":666,
-"actionCall":"/my1sturl{id}-{name}-{label}-{type}-{prefix}-{from}-{to}-{digits}-{suffix}-{who}-{when}-{comment}-{info}"
-},
-{
-"threshold":888,
-"actionCall":"/my2ndurl{id}-{name}-{label}-{type}-{prefix}-{from}-{to}-{digits}-{suffix}-{who}-{when}-{comment}-{info}"
-}
-]
+   "CosmosDBEndpoint": "https://numerator-test.documents.azure.com:443",
+   "CosmosDBEndpoint_SettingName": "TEST_CDB_ENDPOINT",
+   "CosmosDBAuthorizationKey": "XRysJNSrlsLfAZ5LAdh8YIrzEIGigtL6J5Y02syXquqh3Ss7bFP9vdkJLFBsrGqRyd8wYsQgoP6SN5yxgDchOQ==",
+   "CosmosDBAuthorizationKey_ConnectionStringName": "TEST_CDB_AUTHKEY",
+   "CosmosDBDatabaseId": "test-numerator",
+   "CosmosDBDatabaseId_SettingName": "TEST_CDB_DBID",
+   "CosmosDBCollectionId": "numberpools",
+   "CosmosDBCollectionId_SettingName": "TEST_CDB_COLLID",
+   "numeratorId": "bbbe9123-d859-4ef3-a1b7-8703dba972c5",
+   "numeratorId_SettingName": "TEST_NUMID",
+   "numeratorName": "mytestnum",
+   "numeratorName_SettingName": "TEST_NUMNAME",
+   "numberOfRetries": 9,
+   "numberOfRetries_SettingName": "TEST_NUMOFRETRIES"
 }

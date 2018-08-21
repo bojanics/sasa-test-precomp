@@ -26,7 +26,7 @@ public static async Task<HttpResponseMessage> Run(HttpRequestMessage req, TraceW
         rootloc = Directory.GetParent(rootloc).FullName;
     }
 
-    const string DEFAULT_retriesNumber_CODE = "1";
+    const string DEFAULT_numberOfRetries_CODE = "1";
 
     JObject response_body = new JObject();
 
@@ -271,20 +271,20 @@ public static async Task<HttpResponseMessage> Run(HttpRequestMessage req, TraceW
 
         addPoolInfo.Add("poolActions", poolActionsObj);
 
-        ParamInfo retriesNumber_transf = CommonNumeratorUtilities.handleParameter(json, config_json, "retriesNumber", true, null, DEFAULT_retriesNumber_CODE, null, log);
-        CommonNumeratorUtilities.AddResponseParam(addPoolInfo, retriesNumber_transf, false, false, true);
-        int retriesNumber = 1;
-        if (retriesNumber_transf.value != null)
+        ParamInfo numberOfRetries_transf = CommonNumeratorUtilities.handleParameter(json, config_json, "numberOfRetries", true, null, DEFAULT_numberOfRetries_CODE, null, log);
+        CommonNumeratorUtilities.AddResponseParam(addPoolInfo, numberOfRetries_transf, false, false, true);
+        int numberOfRetries = 1;
+        if (numberOfRetries_transf.value != null)
         {
             try
             {
-                retriesNumber = Int32.Parse(retriesNumber_transf.value);
+                numberOfRetries = Int32.Parse(numberOfRetries_transf.value);
             }
             catch (Exception ex)
             {
                 if (firstErrorMsg == null)
                 {
-                    firstErrorMsg = "Pool will not be added because the 'retriesNumber' parameter value is not an integer!";
+                    firstErrorMsg = "Pool will not be added because the 'numberOfRetries' parameter value is not an integer!";
                 }
             }
         }
@@ -328,7 +328,7 @@ public static async Task<HttpResponseMessage> Run(HttpRequestMessage req, TraceW
             }
         }
 
-        numerator_info = await addPool(CosmosDBEndpoint_transf.value, CosmosDBAuthorizationKey_transf.value, CosmosDBDatabaseId_transf.value, CosmosDBCollectionId_transf.value, id, numeratorName_transf.value, poolPrefix_transf.value,from,to, digits, poolSuffix_transf.value, poolWho, poolWhen, poolComment, poolActionsObj, poolInfo_req, retriesNumber, log);
+        numerator_info = await addPool(CosmosDBEndpoint_transf.value, CosmosDBAuthorizationKey_transf.value, CosmosDBDatabaseId_transf.value, CosmosDBCollectionId_transf.value, id, numeratorName_transf.value, poolPrefix_transf.value,from,to, digits, poolSuffix_transf.value, poolWho, poolWhen, poolComment, poolActionsObj, poolInfo_req, numberOfRetries, log);
 
         statusCode = HttpStatusCode.OK;
         statusMessage = "Pool successfully created.";
