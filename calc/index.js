@@ -108,9 +108,8 @@ function handleCalc(context,req,calcinfo,data,calc) {
    var statusCode = null;
    var statusMessage = null;
    try {
-      context.log("INPUT DATA="+JSON.stringify(data));
-      var crstr = calc.calculate(data);
-      context.log("OUTPUT DATA="+crstr);
+      // here we stringify/parse JSON to remove implicit Date object
+      var crstr = calc.calculate(JSON.parse(JSON.stringify(data)));
       calcres = JSON.parse(crstr);
       for (var p in calcres) {
          if (p.toLowerCase().startsWith("xlew_")) {
