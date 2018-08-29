@@ -1,3 +1,4 @@
+(function(exports){
 exports.calculate = function (co){
 var eeisus=0;var eetrue="TRUE";var eefalse="FALSE";var eedec=",";var eeth=".";var eedecreg=new RegExp(",","g");var eethreg=new RegExp("\\.","g");var eecurrencyreg=new RegExp("€","g");var eepercentreg=new RegExp("%","g"); var fmtdaynamesshort=new Array("So.","Mo.","Di.","Mi.","Do.","Fr.","Sa."); var fmtdaynameslong=new Array("Sonntag","Montag","Dienstag","Mittwoch","Donnerstag","Freitag","Samstag"); var fmtmonthnamesshort=new Array("Jän","Feb","Mär","Apr","Mai","Jun","Jul","Aug","Sep","Okt","Nov","Dez"); var fmtmonthnameslong=new Array("Jänner","Februar","März","April","Mai","Juni","Juli","August","September","Oktober","November","Dezember"); var fmtstrings=new Array(".","/"); var fmtdate1=[7,32,3,32,11]; var fmtdate2=[7,33,3,33]; var fmtdate3=[7,32,3,32,11];
 var fnCalls= new Array();
@@ -181,3 +182,4 @@ function eemonth_str(serial_number){return eemonth(eeparsedate(serial_number,1))
 function year_str(serial_number){return year(eeparsedate(serial_number,1));}
 return calc(co);
 }
+})(typeof exports === 'undefined'? this['calc']={}: exports);
