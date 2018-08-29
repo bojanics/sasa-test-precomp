@@ -112,7 +112,7 @@ function handleCalc(context,req,calcinfo,data,calc) {
       calcres = JSON.parse(crstr);
       for (var p in calcres) {
          if (p.toLowerCase().startsWith("xlew_")) {
-            delete jsond[p];
+            delete calcres[p];
          }
       }    
       statusCode = 200;
