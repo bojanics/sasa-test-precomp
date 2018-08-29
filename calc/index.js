@@ -162,7 +162,7 @@ function handleData(context,req,config_json,calcinfo) {
       data = data_req;
    }
    // clone data so that it stays untouched in calcinfo object
-   calcinfo[PARAM_NAME_DATA] = data;
+   calcinfo[PARAM_NAME_DATA] = data!=null ? JSON.parse(JSON.stringify(data)) : data;
    return data;
 }
 
