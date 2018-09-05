@@ -1,6 +1,0 @@
-{
-   "CosmosDBEndpoint": "https://sasa-test.documents.azure.com:443",
-   "CosmosDBAuthorizationKey": "XRysJNSllsVfZV5LAdh8YIrzOIGigtL6J5Y02syXquUh1SE7bFP9vdkJLFBsrGqRyd4wYsQgoP6SN5yxgDcjOQ==",
-   "CosmosDBDatabaseId": "test-numerator",
-   "CosmosDBCollectionId": "numberpools"
-}
