@@ -1,0 +1,24 @@
+{
+  "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentParameters.json#",
+  "contentVersion": "1.0.0.0",
+  "parameters": {
+    "customApis_connector_name": {
+      "value": "MailJet-risktech.io"
+    },
+    "customApis_clientId": {
+      "value": "050a8bd3-93f7-485e-9f3a-771a8c87c7de"
+    },
+    "customApis_clientSecret": {
+      "value": "ftdRbzQtdSuGVDdGQPCH6qdbtjOLwKKwcaTmSj80LB4="
+    },
+    "customApis_resourceUri": {
+      "value": "https://management.core.windows.net/"
+    },
+    "customApis_tenantId": {
+      "value": "common"
+    },
+    "customApis_host": {
+      "value": "togetherservicev4.azurewebsites.net"
+    }
+  }
+}

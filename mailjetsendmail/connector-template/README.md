@@ -1,0 +1,1 @@
+This folder is for The Azure Resource Manager template.

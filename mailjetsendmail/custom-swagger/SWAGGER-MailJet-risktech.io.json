@@ -1,0 +1,913 @@
+{
+	"swagger": "2.0",
+	"info": {
+		"title": "[parameters('customApis_host')]",
+		"description": "Base functions API proxies",
+		"version": "1.0.0",
+		"termsOfService": "Together Teamsolutions Co., Ltd. DISCLAIMS ALL WARRANTIES, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO ANY WARRANTY THAT THE USE OF THE INFORMATION HEREIN WILL NOT INFRINGE ANY RIGHTS OR ANY IMPLIED WARRANTIES OF MERCHANTABILITY OR FITNESS FOR A PARTICULAR PURPOSE. While every precaution has been taken in the preparation of this document, the author assumes no responsibility for errors or omissions, or for damages resulting from the use of the information contained in this document.",
+		"contact": {
+			"name": "Together Teamsolution Co., Ltd.",
+			"url": "http://www.togetherteam.co.th",
+			"email": "office@togetherteam.co.th"
+		},
+		"license": {
+			"name": "(c) Copyright Together Teamsolutions Co., Ltd. All rights reserved.",
+			"url": "http://www.togetherteam.co.th"
+		}
+	},
+	"host": "[parameters('customApis_host')]",
+	"basePath": "/",
+	"schemes": [
+		"https"
+	],
+	"consumes": [],
+	"produces": [],
+	"paths": {
+		"/api/MailJet-SendEMail-v1": {
+			"post": {
+				"operationId": "MailJet_V2",
+				"summary": "Send an email (V2)",
+				"produces": [
+					"application/json"
+				],
+				"consumes": [
+					"application/json"
+				],
+				"parameters": [{
+						"name": "body",
+						"in": "body",
+						"schema": {
+							"$ref": "#/definitions/MailJet-SendMailReq"
+						}
+					}
+				],
+				"description": "The connector is for email sending by MailJet API. You can send email with attachment which can be URL or base64 content and send email to multiple recepients. For prettier look and feel of email, MailJet also allows you to use MailJet template with override variables.",
+				"responses": {
+					"200": {
+						"description": "All went well. Congrats!",
+						"schema": {
+							"$ref": "#/definitions/MailJet-SendMailRes"
+						}
+					},
+					"201": {
+						"description": " Createt The POST request was successfully executed. "
+					},
+					"204": {
+						"description": "No Content No content found or expected to return. Returned when DELETE was successful."
+					},
+					"304": {
+						"description": "The PUT request didn't affect any record."
+					},
+					"400": {
+						"description": "One or more parameters are missing or maybe mispelled (unknown resource or action)"
+					},
+					"401": {
+						"description": "You have specified an incorrect Api Key / API Secret Key. You may be unauthorized to access the API or your API key may be expired."
+					},
+					"403": {
+						"description": "You are not authorised to access this resource."
+					},
+					"404": {
+						"description": "The resource with the specified ID you are trying to reach does not exist.."
+					},
+					"405": {
+						"description": "The method requested on the resource does not exist."
+					},
+					"429": {
+						"description": "Oops! You have reach the maximum number of calls allowed per minute by our API. Please review your integration to reduce the number of call issued by your system."
+					},
+					"500": {
+						"description": "Ouch! Something went wrong on our side and we apologize! When such error occurs, it will contain an error identifier in it's description (e.g. 'ErrorIdentifier' : 'D4DF574C-0C5F-45C7-BA52-7AA8E533C3DE'), which is crucial for us to track the problem and identify the root cause."
+					}
+				},
+				"security": [{
+						"oauth2_auth": []
+					}
+				]
+			}
+		}
+	},
+	"definitions": {
+		"MailJet-SendMailReq": {
+			"type": "object",
+			"properties": {
+				"Configuration": {
+					"type": "string",
+					"description": "Configuration can be file name + relative path or URL.",
+					"title": "Configuration",
+					"x-ms-summary": "Configuration"
+				},
+				"Configuration_SettingName": {
+					"type": "string",
+					"description": "Name of application setting for Configuration.",
+					"x-ms-summary": "Configuration_SettingName",
+					"title": "Configuration_SettingName",
+					"x-ms-visibility": "advanced"
+				},
+				"MJAPI_PublicKey": {
+					"type": "string",
+					"description": "Public key of MailJet API.",
+					"x-ms-summary": "MJAPI_PublicKey",
+					"title": "MJAPI_PublicKey",
+					"x-ms-visibility": "advanced"
+				},
+				"MJAPI_PublicKey_ConnectionStringName": {
+					"type": "string",
+					"description": "App Setting name ofMJAPI_PublicKey.",
+					"x-ms-summary": "MJAPI_PublicKey_ConnectionStringName",
+					"title": "MJAPI_PublicKey_ConnectionStringName",
+					"x-ms-visibility": "advanced"
+				},
+				"MJAPI_PrivateKey": {
+					"type": "string",
+					"description": "Private key of MailJet API.",
+					"x-ms-summary": "MJAPI_PrivateKey",
+					"title": "MJAPI_PrivateKey",
+					"x-ms-visibility": "advanced"
+				},
+				"MJAPI_PrivateKey_ConnectionStringName": {
+					"type": "string",
+					"description": "App Setting name of MJAPI_PrivateKey.",
+					"x-ms-summary": "MJAPI_PrivateKey_ConnectionStringName",
+					"title": "MJAPI_PrivateKey_ConnectionStringName",
+					"x-ms-visibility": "advanced"
+				},
+				"SenderMail": {
+					"type": "string",
+					"description": "Mail of MailJet API owner.",
+					"x-ms-summary": "SenderMail",
+					"title": "SenderMail",
+					"x-ms-visibility": "advanced"
+				},
+				"SenderMail_SettingName": {
+					"type": "string",
+					"description": "App Setting name of SenderMail.",
+					"x-ms-summary": "SenderMail_SettingName",
+					"title": "SenderMail_SettingName",
+					"x-ms-visibility": "advanced"
+				},
+				"SenderName": {
+					"type": "string",
+					"description": "Sender name.",
+					"x-ms-summary": "SenderName",
+					"title": "SenderName",
+					"x-ms-visibility": "advanced"
+				},
+				"SenderName_SettingName": {
+					"type": "string",
+					"description": "App Setting name of SenderName.",
+					"x-ms-summary": "SenderName_SettingName",
+					"title": "SenderName_SettingName",
+					"x-ms-visibility": "advanced"
+				},
+				"Subject": {
+					"type": "string",
+					"description": "Subject of mail.",
+					"x-ms-summary": "Subject",
+					"title": "Subject",
+					"x-ms-visibility": "advanced"
+				},
+				"Subject_SettingName": {
+					"type": "string",
+					"description": "Name of application setting for Subject.",
+					"x-ms-summary": "Subject_SettingName",
+					"title": "Subject_SettingName",
+					"x-ms-visibility": "advanced"
+				},
+				"Body_TextPlain": {
+					"type": "string",
+					"description": "Mail body in text plain.",
+					"x-ms-summary": "Body_TextPlain",
+					"title": "Body_TextPlain",
+					"x-ms-visibility": "advanced"
+				},
+				"Body_TextPlain_SettingName": {
+					"type": "string",
+					"description": "Name of application setting for Body_TextPlain.",
+					"x-ms-summary": "Body_TextPlain_SettingName",
+					"title": "Body_TextPlain_SettingName",
+					"x-ms-visibility": "advanced"
+				},
+				"Body_HTML": {
+					"type": "string",
+					"description": "Mail body in HTML format.",
+					"x-ms-summary": "Body_HTML",
+					"title": "Body_HTML",
+					"x-ms-visibility": "advanced"
+				},
+				"Body_HTML_SettingName": {
+					"type": "string",
+					"description": "Name of application setting for Body_HTML.",
+					"x-ms-summary": "Body_HTML_SettingName",
+					"title": "Body_HTML_SettingName",
+					"x-ms-visibility": "advanced"
+				},
+				"To": {
+					"type": "array",
+					"items": {
+						"type": "string",
+						"title": ""
+					},
+					"description": "List of recipients.",
+					"x-ms-summary": "To"
+				},
+				"To_SettingName": {
+					"type": "string",
+					"description": "Name of application setting for To.",
+					"x-ms-summary": "To_SettingName",
+					"title": "To_SettingName",
+					"x-ms-visibility": "advanced"
+				},
+				"Cc": {
+					"type": "array",
+					"items": {
+						"type": "string",
+						"title": "",
+						"x-ms-visibility": "advanced"
+					},
+					"description": "List of carbon copy.",
+					"x-ms-summary": "Cc"
+				},
+				"Cc_SettingName": {
+					"type": "string",
+					"description": "Name of application setting for Cc.",
+					"x-ms-summary": "Cc_SettingName",
+					"title": "Cc_SettingName",
+					"x-ms-visibility": "advanced"
+				},
+				"Bcc": {
+					"type": "array",
+					"items": {
+						"type": "string",
+						"title": "",
+						"x-ms-visibility": "advanced"
+					},
+					"description": "List of blind carbon copy.",
+					"x-ms-summary": "Bcc"
+				},
+				"Bcc_SettingName": {
+					"type": "string",
+					"description": "Name of application setting for Bcc.",
+					"x-ms-summary": "Bcc_SettingName",
+					"title": "Bcc_SettingName",
+					"x-ms-visibility": "advanced"
+				},
+				"ReplyTo": {
+					"type": "string",
+					"description": "Set default ReplyTo with specified email.",
+					"x-ms-summary": "ReplyTo",
+					"title": "ReplyTo",
+					"x-ms-visibility": "advanced"
+				},
+				"ReplyTo_SettingName": {
+					"type": "string",
+					"description": "Name of application setting for ReplyTo.",
+					"x-ms-summary": "ReplyTo_SettingName",
+					"title": "ReplyTo_SettingName",
+					"x-ms-visibility": "advanced"
+				},
+				"Attachments": {
+					"type": "array",
+					"items": {
+						"type": "string",
+						"title": "",
+						"x-ms-visibility": "advanced"
+					},
+					"description": "Attachment URL that end with file name and extension.",
+					"x-ms-summary": "Attachments"
+				},
+				"Attachments_SettingName": {
+					"type": "string",
+					"description": "Name of application setting for Attachments.",
+					"x-ms-summary": "Attachments_SettingName",
+					"title": "Attachments_SettingName",
+					"x-ms-visibility": "advanced"
+				},
+				"Attachments_Base64": {
+					"type": "array",
+					"items": {
+						"type": "object",
+						"properties": {
+							"FileName": {
+								"type": "string",
+								"description": "FileName",
+								"x-ms-summary": "FileName",
+								"title": "FileName",
+								"x-ms-visibility": "advanced"
+							},
+							"Content_Type": {
+								"type": "string",
+								"description": "Content_Type",
+								"x-ms-summary": "Content_Type",
+								"title": "Content_Type",
+								"x-ms-visibility": "advanced"
+							},
+							"Base64_Content": {
+								"type": "string",
+								"description": "Base64_Content",
+								"x-ms-summary": "Base64_Content",
+								"title": "Base64_Content",
+								"x-ms-visibility": "advanced"
+							}
+						}
+					},
+					"description": "Attachment contents with base64 file content.It contains FileName, Content_Type and Base64_Content.",
+					"x-ms-summary": "Attachments_Base64"
+				},
+				"Attachments_Base64_SettingName": {
+					"type": "string",
+					"description": "Name of application setting for Attachments_Base64.",
+					"x-ms-summary": "Attachments_Base64_SettingName",
+					"title": "Attachments_Base64_SettingName",
+					"x-ms-visibility": "advanced"
+				},
+				"TemplateID": {
+					"type": "string",
+					"description": "Template ID of mail template.",
+					"x-ms-summary": "TemplateID",
+					"title": "TemplateID",
+					"x-ms-visibility": "advanced"
+				},
+				"TemplateID_SettingName": {
+					"type": "string",
+					"description": "Name of application setting for TemplateID.",
+					"x-ms-summary": "TemplateID_SettingName",
+					"title": "TemplateID_SettingName",
+					"x-ms-visibility": "advanced"
+				},
+				"data": {
+					"type": "object",
+					"description": "Variable and value to send to mail template.",
+					"x-ms-visibility": "advanced",
+					"x-ms-summary": "data"
+				},
+				"Template": {
+					"type": "string",
+					"description": "URL or relative path + file name of template file in Plain Text format.",
+					"x-ms-summary": "Template",
+					"title": "Template",
+					"x-ms-visibility": "advanced"
+				},
+				"Template_SettingName": {
+					"type": "string",
+					"description": "Name of application setting for Template.",
+					"x-ms-summary": "Template_SettingName",
+					"title": "Template_SettingName",
+					"x-ms-visibility": "advanced"
+				},
+				"Template_HTML": {
+					"type": "string",
+					"description": "URL or relative path + file name of template file in HTML format.",
+					"x-ms-summary": "Template_HTML",
+					"title": "Template_HTML",
+					"x-ms-visibility": "advanced"
+				},
+				"Template_HTML_SettingName": {
+					"type": "string",
+					"description": "Name of application setting for Template_HTML.",
+					"x-ms-summary": "Template_HTML_SettingName",
+					"title": "Template_HTML_SettingName",
+					"x-ms-visibility": "advanced"
+				},
+				"xsl": {
+					"type": "string",
+					"description": "URL or relative path + file name of template file in XSLT format for Plain Text.",
+					"x-ms-summary": "xsl",
+					"title": "xsl",
+					"x-ms-visibility": "advanced"
+				},
+				"xsl_SettingName": {
+					"type": "string",
+					"description": "Name of application setting for xsl.",
+					"x-ms-summary": "xsl_SettingName",
+					"title": "xsl_SettingName",
+					"x-ms-visibility": "advanced"
+				},
+				"xslHTML": {
+					"type": "string",
+					"description": "URL or relative path + file name of template file in XSLT format for HTML.",
+					"x-ms-summary": "xslHTML",
+					"title": "xslHTML",
+					"x-ms-visibility": "advanced"
+				},
+				"xslHTML_SettingName": {
+					"type": "string",
+					"description": "Name of application setting for xslHTML.",
+					"x-ms-summary": "xslHTML_SettingName",
+					"title": "xslHTML_SettingName",
+					"x-ms-visibility": "advanced"
+				},
+				"xslPre": {
+					"type": "string",
+					"description": "URL or relative path + file name of pre-transformation file for plain text in XSL template.",
+					"x-ms-summary": "xslPre",
+					"title": "xslPre",
+					"x-ms-visibility": "advanced"
+				},
+				"xslPre_SettingName": {
+					"type": "string",
+					"description": "Name of application setting for xslPre.",
+					"x-ms-summary": "xslPre_SettingName",
+					"title": "xslPre_SettingName",
+					"x-ms-visibility": "advanced"
+				},
+				"xslPre_HTML": {
+					"type": "string",
+					"description": "URL or relative path + file name of pre-transformation file for plain text in XSL template.",
+					"x-ms-summary": "xslPre_HTML",
+					"title": "xslPre_HTML",
+					"x-ms-visibility": "advanced"
+				},
+				"xslPre_HTML_SettingName": {
+					"type": "string",
+					"description": "Name of application setting for xslPre_HTML.",
+					"x-ms-summary": "xslPre_HTML_SettingName",
+					"title": "xslPre_HTML_SettingName",
+					"x-ms-visibility": "advanced"
+				}
+			},
+			"example": {
+				"Configuration": "MailJet.configure.json",
+				"Configuration_SettingName": "MailJet_DEFAULT_Configuration",
+				"MJAPI_PublicKey": "e8be91d733bbc864645194615a15a279",
+				"MJAPI_PublicKey_ConnectionStringName": "MailJet_DEFAULT_MJAPI_PublicKey",
+				"MJAPI_PrivateKey": "ee22e52deaf01bfb7e64ac09890e9230",
+				"MJAPI_PrivateKey_ConnectionStringName": "MailJet_DEFAULT_MJAPI_PrivateKey",
+				"SenderMail": "k.wongsin@togetherteam.co.th",
+				"SenderMail_SettingName": "MailJet_DEFAULT_SenderMail",
+				"SenderName": "Kunakorn_Wong_TOG",
+				"SenderName_SettingName": "MailJet_DEFAULT_SenderName",
+				"Subject": "[KKK] Testing MailJet function",
+				"Subject_SettingName": "MailJet_DEFAULT_Subject",
+				"Body_TextPlain": "Dear passenger, welcome to Mailjet! May the delivery force be with you!",
+				"Body_TextPlain_SettingName": "MailJet_DEFAULT_Body_TextPlain",
+				"Body_HTML": "<h3>Dear passenger, welcome to Mailjet!</h3><br />May the delivery force be with you!",
+				"Body_HTML_SettingName": "MailJet_DEFAULT_Body_HTML",
+				"To": [
+					"k.wongsin@togetherteam.co.th"
+				],
+				"To_SettingName": "MailJet_DEFAULT_To",
+				"Cc": [
+					"abcdefg<anat_usa@hotmail.com>"
+				],
+				"Cc_SettingName": "MailJet_DEFAULT_Cc",
+				"Bcc": [
+					"Kunakorn<kunakorn_w@hotmail.co.th>"
+				],
+				"Bcc_SettingName": "MailJet_DEFAULT_Bcc",
+				"ReplyTo": "JoyCoin<p.phechpanaprai@togetherteam.co.th>",
+				"Attachments": [
+					"https://image.dogilike.com/shareimg/contentimg/mameaw_2/Dogilike/Knowlage%2021/11.jpg",
+					"http://s.isanook.com/wo/0/ud/4/21581/a3.jpg"
+				],
+				"Attachments_SettingName": "MailJet_DEFAULT_Attachments",
+				"Attachments_Base64": [{
+						"FileName": "dog30.jpg",
+						"Content_Type": "image/jpeg",
+						"Base64_Content": "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"
+					}, {
+						"FileName": "original.jpg",
+						"Content_Type": "image/jpeg",
+						"Base64_Content": "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"
+					}
+				],
+				"Attachments_Base64_SettingName": "MailJet_DEFAULT_Attachments_Base64",
+				"TemplateID": "347239",
+				"TemplateID_SettingName": "MailJet_DEFAULT_TemplateID",
+				"data": {
+					"recipient": "Sir",
+					"intro": "I'm MailJet function",
+					"name": "MailJet",
+					"submission_by": "together",
+					"submission_form_number": "123",
+					"subobj": {
+						"soinfo1": "soval1"
+					},
+					"categories": [
+						"cat1",
+						"cat2"
+					],
+					"attachments": [{
+							"name": "n1",
+							"description": "desc1",
+							"type": "txt",
+							"content_base64": "dGV4dDE="
+						}, {
+							"name": "n2",
+							"description": "desc2",
+							"type": "txt",
+							"content_base64": "dGV4dDI="
+						}
+					]
+				},
+				"Template": "https://k2function8c7e.blob.core.windows.net/azure-webjobs-hosts/sample.txt",
+				"Template_SettingName": "MailJet_DEFAULT_Template",
+				"Template_HTML": "https://k2function8c7e.blob.core.windows.net/azure-webjobs-hosts/sample.html",
+				"Template_HTML_SettingName": "MailJet_DEFAULT_Template_HTML",
+				"xsl": "https://k2function8c7e.blob.core.windows.net/azure-webjobs-hosts/default.xsl",
+				"xsl_SettingName": "MailJet_DEFAULT_xsl",
+				"xslHTML": "https://k2function8c7e.blob.core.windows.net/azure-webjobs-hosts/defaultHTML.xsl",
+				"xslHTML_SettingName": "MailJet_DEFAULT_xslHTML",
+				"xslPre": "https://k2function8c7e.blob.core.windows.net/azure-webjobs-hosts/defaultPre.xsl",
+				"xslPre_SettingName": "MailJet_DEFAULT_xslPre",
+				"xslPre_HTML": "https://k2function8c7e.blob.core.windows.net/azure-webjobs-hosts/defaultPre.xsl",
+				"xslPre_HTML_SettingName": "MailJet_DEFAULT_xslPre_HTML"
+			}
+		},
+		"MailJet-SendMailRes": {
+			"type": "object",
+			"properties": {
+				"status": {
+					"type": "integer",
+					"format": "int32",
+					"description": "status",
+					"x-ms-summary": "status"
+				},
+				"status_message": {
+					"type": "string",
+					"description": "status_message",
+					"x-ms-summary": "status_message"
+				},
+				"mailjet_response": {
+					"type": "array",
+					"items": {
+						"type": "object",
+						"properties": {
+							"Status": {
+								"type": "string",
+								"description": "Status",
+								"x-ms-summary": "Status"
+							},
+							"CustomID": {
+								"type": "string",
+								"description": "CustomID",
+								"x-ms-summary": "CustomID"
+							},
+							"To": {
+								"type": "array",
+								"items": {
+									"type": "object",
+									"properties": {
+										"Email": {
+											"type": "string",
+											"description": "Email",
+											"x-ms-summary": "Email"
+										},
+										"MessageUUID": {
+											"type": "string",
+											"description": "MessageUUID",
+											"x-ms-summary": "MessageUUID"
+										},
+										"MessageID": {
+											"type": "integer",
+											"description": "MessageID",
+											"x-ms-summary": "MessageID"
+										},
+										"MessageHref": {
+											"type": "string",
+											"description": "MessageHref",
+											"x-ms-summary": "MessageHref"
+										}
+									}
+								},
+								"description": "To",
+								"x-ms-summary": "To"
+							},
+							"Cc": {
+								"type": "array",
+								"items": {
+									"type": "object",
+									"properties": {
+										"Email": {
+											"type": "string",
+											"description": "Email",
+											"x-ms-summary": "Email"
+										},
+										"MessageUUID": {
+											"type": "string",
+											"description": "MessageUUID",
+											"x-ms-summary": "MessageUUID"
+										},
+										"MessageID": {
+											"type": "integer",
+											"description": "MessageID",
+											"x-ms-summary": "MessageID"
+										},
+										"MessageHref": {
+											"type": "string",
+											"description": "MessageHref",
+											"x-ms-summary": "MessageHref"
+										}
+									},
+									"description": "Cc",
+									"x-ms-summary": "Cc"
+								}
+							},
+							"Bcc": {
+								"type": "array",
+								"items": {
+									"type": "object",
+									"properties": {
+										"Email": {
+											"type": "string",
+											"description": "Email",
+											"x-ms-summary": "Email"
+										},
+										"MessageUUID": {
+											"type": "string",
+											"description": "MessageUUID",
+											"x-ms-summary": "MessageUUID"
+										},
+										"MessageID": {
+											"type": "integer",
+											"description": "MessageID",
+											"x-ms-summary": "MessageID"
+										},
+										"MessageHref": {
+											"type": "string",
+											"description": "MessageHref",
+											"x-ms-summary": "MessageHref"
+										}
+									},
+									"description": "Bcc",
+									"x-ms-summary": "Bcc"
+								}
+							}
+						}
+					},
+					"description": "mailjet_response",
+					"x-ms-summary": "mailjet_response"
+				},
+				"mailjetInfo": {
+					"type": "object",
+					"properties": {
+						"Configuration": {
+							"type": "string",
+							"description": "Configuration",
+							"x-ms-summary": "Configuration"
+						},
+						"MJAPI_PublicKey": {
+							"type": "string",
+							"description": "MJAPI_PublicKey",
+							"x-ms-summary": "MJAPI_PublicKey"
+						},
+						"MJAPI_PrivateKey": {
+							"type": "string",
+							"description": "MJAPI_PrivateKey",
+							"x-ms-summary": "MJAPI_PrivateKey"
+						},
+						"SenderMail": {
+							"type": "string",
+							"description": "SenderMail",
+							"x-ms-summary": "SenderMail"
+						},
+						"SenderName": {
+							"type": "string",
+							"description": "SenderName",
+							"x-ms-summary": "SenderName"
+						},
+						"Subject": {
+							"type": "string",
+							"description": "Subject",
+							"x-ms-summary": "Subject"
+						},
+						"Body_TextPlain": {
+							"type": "string",
+							"description": "Body_TextPlain",
+							"x-ms-summary": "Body_TextPlain"
+						},
+						"Body_HTML": {
+							"type": "string",
+							"description": "Body_HTML",
+							"x-ms-summary": "Body_HTML"
+						},
+						"To": {
+							"type": "array",
+							"items": {
+								"type": "string"
+							},
+							"description": "To",
+							"x-ms-summary": "To"
+						},
+						"Cc": {
+							"type": "array",
+							"items": {
+								"type": "string"
+							},
+							"description": "Cc",
+							"x-ms-summary": "Cc"
+						},
+						"Bcc": {
+							"type": "array",
+							"items": {
+								"type": "string"
+							},
+							"description": "Bcc",
+							"x-ms-summary": "Bcc"
+						},
+						"ReplyTo": {
+							"type": "string",
+							"description": "ReplyTo",
+							"x-ms-summary": "ReplyTo"
+						},
+						"Attachments": {
+							"type": "array",
+							"items": {
+								"type": "string"
+							},
+							"description": "Attachments",
+							"x-ms-summary": "Attachments"
+						},
+						"Attachments_Base64": {
+							"type": "array",
+							"items": {
+								"type": "object",
+								"properties": {
+									"FileName": {
+										"type": "string",
+										"description": "FileName",
+										"x-ms-summary": "FileName"
+									},
+									"Content_Type": {
+										"type": "string",
+										"description": "Content_Type",
+										"x-ms-summary": "Content_Type"
+									},
+									"Base64_Content": {
+										"type": "string",
+										"description": "Base64_Content",
+										"x-ms-summary": "Base64_Content"
+									}
+								},
+								"description": "Attachments_Base64",
+								"x-ms-summary": "Attachments_Base64"
+							}
+						},
+						"TemplateID": {
+							"type": "string",
+							"description": "TemplateID",
+							"x-ms-summary": "TemplateID"
+						},
+						"data": {
+							"type": "object"
+						},
+						"Template": {
+							"type": "string",
+							"description": "Template",
+							"x-ms-summary": "Template"
+						},
+						"Template_HTML": {
+							"type": "string",
+							"description": "Template_HTML",
+							"x-ms-summary": "Template_HTML"
+						},
+						"xsl": {
+							"type": "string",
+							"description": "xsl",
+							"x-ms-summary": "xsl"
+						},
+						"xslHTML": {
+							"type": "string",
+							"description": "xslHTML",
+							"x-ms-summary": "xslHTML"
+						},
+						"xslPre": {
+							"type": "string",
+							"description": "xslPre",
+							"x-ms-summary": "xslPre"
+						},
+						"xslPre_HTML": {
+							"type": "string",
+							"description": "xslPre_HTML",
+							"x-ms-summary": "xslPre_HTML"
+						}
+					},
+					"description": "mailjetInfo",
+					"x-ms-summary": "mailjetInfo"
+				}
+			},
+			"example": {
+				"status": 200,
+				"status_message": "Emails have been sent.",
+				"mailjet_response": [{
+						"Status": "success",
+						"CustomID": "",
+						"To": [{
+								"Email": "k.wongsin@togetherteam.co.th",
+								"MessageUUID": "86a01eb9-a935-496e-8062-a18233cf0a0c",
+								"MessageID": 70650219385061987,
+								"MessageHref": "https://api.mailjet.com/v3/REST/message/70650219385061987"
+							}
+						],
+						"Cc": [{
+								"Email": "anat_usa@hotmail.com",
+								"MessageUUID": "6fc46a23-b0b7-4fb0-9d22-35cfa22a5aac",
+								"MessageID": 70650219385061988,
+								"MessageHref": "https://api.mailjet.com/v3/REST/message/70650219385061988"
+							}
+						],
+						"Bcc": [{
+								"Email": "kunakorn_w@hotmail.co.th",
+								"MessageUUID": "bd7b34e0-6b12-49d0-9fd2-3e37905afaa8",
+								"MessageID": 70650219385061989,
+								"MessageHref": "https://api.mailjet.com/v3/REST/message/70650219385061989"
+							}
+						]
+					}
+				],
+				"mailjetInfo": {
+					"Configuration": "MailJet.configure.json",
+					"MJAPI_PublicKey": "*****",
+					"MJAPI_PrivateKey": "*****",
+					"SenderMail": "k.wongsin@togetherteam.co.th",
+					"SenderName": "Kunakorn_Wong_TOG",
+					"Subject": "[KKK] Testing MailJet function",
+					"Body_TextPlain": "Dear passenger, welcome to Mailjet! May the delivery force be with you!",
+					"Body_HTML": "<h3>Dear passenger, welcome to Mailjet!</h3><br />May the delivery force be with you!",
+					"To": [
+						"k.wongsin@togetherteam.co.th"
+					],
+					"Cc": [
+						"abcdefg<anat_usa@hotmail.com>"
+					],
+					"Bcc": [
+						"Kunakorn<kunakorn_w@hotmail.co.th>"
+					],
+					"ReplyTo": "JoyCoin<p.phechpanaprai@togetherteam.co.th>",
+					"Attachments": [
+						"https://image.dogilike.com/shareimg/contentimg/mameaw_2/Dogilike/Knowlage%2021/11.jpg",
+						"http://s.isanook.com/wo/0/ud/4/21581/a3.jpg"
+					],
+					"Attachments_Base64": [{
+							"FileName": "dog30.jpg",
+							"Content_Type": "image/jpeg",
+							"Base64_Content": "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"
+						}, {
+							"FileName": "original.jpg",
+							"Content_Type": "image/jpeg",
+							"Base64_Content": "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"
+						}
+					],
+					"TemplateID": "347239",
+					"data": {
+						"recipient": "Sir",
+						"intro": "I'm MailJet function",
+						"name": "MailJet",
+						"submission_by": "together",
+						"submission_form_number": "123",
+						"subobj": {
+							"soinfo1": "soval1"
+						},
+						"categories": [
+							"cat1",
+							"cat2",
+							"cat1",
+							"cat2"
+						],
+						"attachments": [{
+								"name": "n1",
+								"description": "desc1",
+								"type": "txt",
+								"content_base64": "dGV4dDE="
+							}, {
+								"name": "n2",
+								"description": "desc2",
+								"type": "txt",
+								"content_base64": "dGV4dDI="
+							}, {
+								"name": "n1",
+								"description": "desc1",
+								"type": "txt",
+								"content_base64": "dGV4dDE="
+							}, {
+								"name": "n2",
+								"description": "desc2",
+								"type": "txt",
+								"content_base64": "dGV4dDI="
+							}
+						]
+					},
+					"Template": "https://k2function8c7e.blob.core.windows.net/azure-webjobs-hosts/sample.txt",
+					"Template_HTML": "https://k2function8c7e.blob.core.windows.net/azure-webjobs-hosts/sample.html",
+					"xsl": "https://k2function8c7e.blob.core.windows.net/azure-webjobs-hosts/default.xsl",
+					"xslHTML": "https://k2function8c7e.blob.core.windows.net/azure-webjobs-hosts/defaultHTML.xsl",
+					"xslPre": "https://k2function8c7e.blob.core.windows.net/azure-webjobs-hosts/defaultPre.xsl",
+					"xslPre_HTML": "https://k2function8c7e.blob.core.windows.net/azure-webjobs-hosts/defaultPre.xsl"
+				}
+			}
+		}
+	},
+	"securityDefinitions": {
+		"oauth2_auth": {
+			"type": "oauth2",
+			"flow": "implicit",
+			"authorizationUrl": "https://login.windows.net/common/oauth2/authorize",
+			"scopes": {}
+		}
+	},
+	"security": [{
+			"oauth2_auth": []
+		}
+	],
+	"tags": []
+}

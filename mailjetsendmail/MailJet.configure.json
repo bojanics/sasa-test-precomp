@@ -1,0 +1,115 @@
+{
+	"MJAPI_PublicKey": "e8be91d733bbc864645194615a15a279",
+	"MJAPI_PublicKey_ConnectionStringName": "MailJet_DEFAULT_MJAPI_PublicKey",
+	"MJAPI_PrivateKey": "ee22e52deaf01bfb7e64ac09890e9230",
+	"MJAPI_PrivateKey_ConnectionStringName": "MailJet_DEFAULT_MJAPI_PrivateKey",
+	"SenderMail": "k.wongsin@togetherteam.co.th",
+	"SenderMail_SettingName": "MailJet_DEFAULT_SenderMail",
+	"SenderName": "Kunakorn_Wong_TOG",
+	"SenderName_SettingName": "MailJet_DEFAULT_SenderName",
+	"Subject": "[KKK] Testing MailJet function",
+	"Subject_SettingName": "MailJet_DEFAULT_Subject",
+	"Body_TextPlain": "Dear passenger, welcome to Mailjet! May the delivery force be with you!",
+	"Body_TextPlain_SettingName": "MailJet_DEFAULT_Body_TextPlain",
+	"Body_HTML": "<h3>Dear passenger, welcome to Mailjet!</h3><br />May the delivery force be with you!",
+	"Body_HTML_SettingName": "MailJet_DEFAULT_Body_HTML",
+	"CustomID": "abc123456",
+	"CustomID_SettingName": "MailJet_DEFAULT_CustomID",
+	"To": ["k.wongsin@togetherteam.co.th"],
+	"To_SettingName": "MailJet_DEFAULT_To",
+	"Cc": ["abcdefg<anat_usa@hotmail.com>"],
+	"Cc_SettingName": "MailJet_DEFAULT_Cc",
+	"Bcc": ["Kunakorn<kunakorn_w@hotmail.co.th>"],
+  "Bcc_SettingName": "MailJet_DEFAULT_Bcc",
+  "Test_To": ["k.wong.ssg@gmail.com"],
+  "Test_To_SettingName": "MailJet_DEFAULT_Test_To",
+  "Test_Cc": ["abcde@togetherteam.co.th"],
+  "Test_Cc_SettingName": "MailJet_DEFAULT_Test_Cc",
+  "Test_Bcc": ["fghij@togetherteam.co.th"],
+  "Test_Bcc_SettingName": "MailJet_DEFAULT_Test_Bcc",
+	"ReplyTo": "JoyCoin<p.phechpanaprai@togetherteam.co.th>",
+	"ReplyTo_SettingName": "MailJet_DEFAULT_ReplyTo",
+	"Attachments": ["https://image.dogilike.com/shareimg/contentimg/mameaw_2/Dogilike/Knowlage%2021/11.jpg", "http://s.isanook.com/wo/0/ud/4/21581/a3.jpg"],
+	"Attachments_SettingName": "MailJet_DEFAULT_Attachments",
+	"Attachments_Base64": [
+            {
+                "FileName": "dog30.jpg",
+                "Content_Type": "image/jpeg",
+                "Base64_Content": "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"
+            },
+            {
+                "FileName": "original.jpg",
+                "Content_Type": "image/jpeg",
+                "Base64_Content": "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"
+            }
+        ],
+	"Attachments_Base64_SettingName": "MailJet_DEFAULT_Attachments_Base64",
+	"TemplateID": "347239",
+	"TemplateID_SettingName": "MailJet_DEFAULT_TemplateID",
+	"data": {
+		"recipient": "Sir",
+		"intro": "I'm MailJet function",
+		"name": "MailJet",
+		"submission_by": "together",
+		"submission_form_number": "123",
+		"subobj": {
+		"soinfo1": "soval1"
+		},
+		"categories": [
+		"cat1",
+		"cat2"
+		],
+		"attachments": [
+		{
+			"name": "n1",
+			"description": "desc1",
+			"type": "txt",
+			"content_base64": "dGV4dDE="
+		},
+		{
+			"name": "n2",
+			"description": "desc2",
+			"type": "txt",
+			"content_base64": "dGV4dDI="
+		}
+		]
+  	},
+	"Template": "https://k2function8c7e.blob.core.windows.net/azure-webjobs-hosts/sample.txt",
+  "Template_SettingName": "MailJet_DEFAULT_Template",
+  "Template_HTML": "https://k2function8c7e.blob.core.windows.net/azure-webjobs-hosts/sample.html",
+  "Template_HTML_SettingName": "MailJet_DEFAULT_Template_HTML",
+  "xsl": "https://k2function8c7e.blob.core.windows.net/azure-webjobs-hosts/default.xsl",
+  "xsl_SettingName": "MailJet_DEFAULT_xsl",
+  "xslHTML": "https://k2function8c7e.blob.core.windows.net/azure-webjobs-hosts/defaultHTML.xsl",
+  "xslHTML_SettingName": "MailJet_DEFAULT_xslHTML",
+  "xslPre": "https://k2function8c7e.blob.core.windows.net/azure-webjobs-hosts/defaultPre.xsl",
+  "xslPre_SettingName": "MailJet_DEFAULT_xslPre",
+  "xslPre_HTML": "https://k2function8c7e.blob.core.windows.net/azure-webjobs-hosts/defaultPre.xsl",
+  "xslPre_HTML_SettingName": "MailJet_DEFAULT_xslPre_HTML",
+  "lang": "en-GB",
+  "lang_SettingName": "MailJet_DEFAULT_lang",
+  "CustomCampaign": "CustomCampaign",
+  "CustomCampaign_SettingName": "MailJet_DEFAULT_CustomCampaign",
+  "DeduplicateCampaign": false,
+  "DeduplicateCampaign_SettingName": "MailJet_DEFAULT_DeduplicateCampaign",
+  "TrackOpens": "account_default",
+  "TrackOpens_SettingName": "MailJet_DEFAULT_TrackOpens",
+  "TrackClicks": "account_default",
+  "TrackClicks_SettingName": "MailJet_DEFAULT_TrackClicks",
+  "EventPayload": "Eticket,1234,row,15,seat,B",
+  "EventPayload_SettingName": "MailJet_DEFAULT_EventPayload",
+  "MonitoringCategory": "Category1",
+  "MonitoringCategory_SettingName": "MailJet_DEFAULT_MonitoringCategory",
+  "URLTags": "param1=1&param2=2",
+  "URLTags_SettingName": "MailJet_DEFAULT_URLTags",
+  "Headers": {
+    "header1": "val1",
+    "header2": "val2"
+  },
+  "Headers_SettingName": "MailJet_DEFAULT_Headers",
+  "Variables": {
+    "param1": "val1",
+    "param2": "val2"
+  },
+  "Variables_SettingName": "MailJet_DEFAULT_Variables"
+}
