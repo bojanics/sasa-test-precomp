@@ -24,9 +24,9 @@
    "certificateFile":"./defaults/default.pfx",
    "certificateFile_SettingName":"SOME_certificateFile_LOCAL",
    "certificatePassword":"password",
-   "certificatePassword_ConnectionStringName":"SOME_certificatePassword_LOCAL",
+   "certificatePassword_SettingName":"SOME_certificatePassword_LOCAL",
    "lockPDF":false,
    "lockPDF_SettingName":"SOME_lockPDF",
    "lockPDFPassword":"password",
-   "lockPDFPassword_ConnectionStringName":"SOME_lockPDFPassword"
+   "lockPDFPassword_SettingName":"SOME_lockPDFPassword"
 }

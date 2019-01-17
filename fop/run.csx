@@ -31,16 +31,9 @@ using org.apache.fop.fonts;
 using org.apache.fop.apps.io;
 using org.apache.avalon.framework.configuration;
 
-private static string APP_SETTING_DEVOPS_NAME = "ENVIRONMENT_DEVOPS";
-private static string APP_SETTING_DEVOPS_PRODVAL = "prd";
-private static string APP_SETTING_LANE_NAME = "ENVIRONMENT_LANE";
-private static string APP_SETTING_LANE_PRODVAL = "liv";
-private static string APP_SETTING_STEP_NAME = "ENVIRONMENT_STEP";
-private static string APP_SETTING_STEP_PRODVAL = "rel";
-private static string APP_SETTING_SPEED_NAME = "ENVIRONMENT_SPEED";
-private static string APP_SETTING_SPEED_PRODVAL = "all";
-private static string APP_SETTING_REGION_NAME = "ENVIRONMENT_REGION";
-private static string APP_SETTING_SLOT_NAME = "ENVIRONMENT_SLOT";
+private static string APP_SETTING_ENVIRONMENT_NAME = "ENVIRONMENT";
+private static string APP_SETTING_ENVIRONMENT_PRODVAL = "p";
+
 
 public static async Task<HttpResponseMessage> Run(HttpRequestMessage req, TraceWriter log, ExecutionContext context)
 {
@@ -190,13 +183,13 @@ public static async Task<HttpResponseMessage> Run(HttpRequestMessage req, TraceW
         AddResponseParam(pdfInfo, signPDFHashAlgorithm_transf, false, false);
         ParamInfo certificateFile_transf = handleParameter(json, config_json, "certificateFile", true, rootloc, DEFAULT_certificateFile_CODE, null, log);
         AddResponseParam(pdfInfo, certificateFile_transf, false, false);
-        ParamInfo certificatePassword_transf = handleParameter(json, config_json, "certificatePassword", false, null, DEFAULT_certificatePassword_CODE, null, log);
+        ParamInfo certificatePassword_transf = handleParameter(json, config_json, "certificatePassword", true, null, DEFAULT_certificatePassword_CODE, null, log);
         AddResponseParam(pdfInfo, certificatePassword_transf, true, false);
 
         ParamInfo lockPDF_transf = handleParameter(json, config_json, "lockPDF", true, null, DEFAULT_lockPDF_CODE, null, log);
         AddResponseParam(pdfInfo, lockPDF_transf, false, true);
         bool doLocking = Boolean.Parse(lockPDF_transf.value);
-        ParamInfo lockPDFPassword_transf = handleParameter(json, config_json, "lockPDFPassword", false, null, DEFAULT_lockPDFPassword_CODE, null, log);
+        ParamInfo lockPDFPassword_transf = handleParameter(json, config_json, "lockPDFPassword", true, null, DEFAULT_lockPDFPassword_CODE, null, log);
         AddResponseParam(pdfInfo, lockPDFPassword_transf, true, false);
 
         if (firstErrorMsg != null)
@@ -771,12 +764,7 @@ private static WatermarkInfo getWatermarkInfo()
     wmInfo.text = null;
     wmInfo.visible = false;
 
-    updateWatermarkInfo(wmInfo, APP_SETTING_DEVOPS_NAME,APP_SETTING_DEVOPS_PRODVAL);
-    updateWatermarkInfo(wmInfo, APP_SETTING_LANE_NAME, APP_SETTING_LANE_PRODVAL);
-    updateWatermarkInfo(wmInfo, APP_SETTING_STEP_NAME, APP_SETTING_STEP_PRODVAL);
-    updateWatermarkInfo(wmInfo, APP_SETTING_SPEED_NAME, APP_SETTING_SPEED_PRODVAL);
-    updateWatermarkInfo(wmInfo, APP_SETTING_REGION_NAME, null);
-    updateWatermarkInfo(wmInfo, APP_SETTING_SLOT_NAME, null);
+    updateWatermarkInfo(wmInfo, APP_SETTING_ENVIRONMENT_NAME,APP_SETTING_ENVIRONMENT_PRODVAL);
 
     return wmInfo;
 }
@@ -827,7 +815,7 @@ private static void setWatermark(byte[] source,Stream destinationStream,string w
         mfs = 12;
     }
     iTextSharp.text.Font FONT2 = new iTextSharp.text.Font(iTextSharp.text.Font.HELVETICA, mfs, iTextSharp.text.Font.BOLD, new Color(255, 0, 0));
-    Phrase p1 = new Phrase("TEST ENVIRONMENT INFO:", FONT1);
+    Phrase p1 = new Phrase("THIS IS A TEST DOCUMENT", FONT1);
     Phrase p2 = new Phrase(watermark, FONT2);
 
     // properties
@@ -853,7 +841,7 @@ private static void setWatermark(byte[] source,Stream destinationStream,string w
         over.SetGState(state);
 
         ColumnText.ShowTextAligned(over, Element.ALIGN_CENTER, p1, x, y+13, 0);
-        ColumnText.ShowTextAligned(over, Element.ALIGN_CENTER, p2, x, y-13, 0);
+        //ColumnText.ShowTextAligned(over, Element.ALIGN_CENTER, p2, x, y-13, 0);
         over.RestoreState();
     }
     stamper.Close();
